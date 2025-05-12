@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -24,7 +25,7 @@ const Navbar = () => {
       <div className="container mx-auto px-4 flex justify-between items-center">
         <div className="flex items-center">
           <a href="#home" className="text-white text-2xl md:text-3xl font-bold font-['Playfair_Display']">
-            <span className="text-cocktail-gold">Bartender</span> Masters
+            <span className="text-cocktail-gold">Bartender</span> Brothers
           </a>
         </div>
         
