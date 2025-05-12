@@ -7,8 +7,6 @@ import Team from "@/components/Team";
 import Services from "@/components/Services";
 import Gallery from "@/components/Gallery";
 import Testimonials from "@/components/Testimonials";
-import Booking from "@/components/Booking";
-import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import BackgroundEffects from "@/components/BackgroundEffects";
 
@@ -45,8 +43,6 @@ const Index = () => {
       <Services />
       <Gallery />
       <Testimonials />
-      <Booking />
-      <Contact />
       <Footer />
     </div>
   );

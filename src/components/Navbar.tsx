@@ -41,7 +41,7 @@ const Navbar = () => {
         
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
-          {['Home', 'About', 'Team', 'Services', 'Gallery', 'Reviews', 'Contact'].map((item) => (
+          {['Home', 'About', 'Team', 'Services', 'Gallery', 'Reviews'].map((item) => (
             <a 
               key={item} 
               href={`#${item.toLowerCase()}`}
@@ -50,12 +50,6 @@ const Navbar = () => {
               {item}
             </a>
           ))}
-          <Button 
-            className="bg-cocktail-gold hover:bg-cocktail-gold/80 text-black font-medium"
-            onClick={() => document.getElementById('booking')?.scrollIntoView()}
-          >
-            Book Now
-          </Button>
         </nav>
 
         {/* Mobile Menu Button */}
@@ -72,7 +66,7 @@ const Navbar = () => {
       {mobileMenuOpen && (
         <div className="md:hidden absolute top-full left-0 w-full glass-effect border-t border-white/10 shadow-lg animate-fade-in-up">
           <div className="container mx-auto py-4 px-4 flex flex-col space-y-4">
-            {['Home', 'About', 'Team', 'Services', 'Gallery', 'Reviews', 'Contact'].map((item) => (
+            {['Home', 'About', 'Team', 'Services', 'Gallery', 'Reviews'].map((item) => (
               <a 
                 key={item} 
                 href={`#${item.toLowerCase()}`}
@@ -82,15 +76,6 @@ const Navbar = () => {
                 {item}
               </a>
             ))}
-            <Button 
-              className="bg-cocktail-gold hover:bg-cocktail-gold/80 text-black w-full"
-              onClick={() => {
-                document.getElementById('booking')?.scrollIntoView();
-                toggleMobileMenu();
-              }}
-            >
-              Book Now
-            </Button>
           </div>
         </div>
       )}
