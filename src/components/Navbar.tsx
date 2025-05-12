@@ -50,6 +50,12 @@ const Navbar = () => {
               {item}
             </a>
           ))}
+          <Button 
+            className="bg-gradient-to-r from-blue-500 to-pink-500 hover:from-blue-600 hover:to-pink-600 text-white font-medium"
+            onClick={() => document.getElementById('booking')?.scrollIntoView({behavior: 'smooth'})}
+          >
+            Book Now
+          </Button>
         </nav>
 
         {/* Mobile Menu Button */}
@@ -76,6 +82,15 @@ const Navbar = () => {
                 {item}
               </a>
             ))}
+            <Button 
+              className="bg-gradient-to-r from-blue-500 to-pink-500 hover:from-blue-600 hover:to-pink-600 text-white w-full"
+              onClick={() => {
+                document.getElementById('booking')?.scrollIntoView({behavior: 'smooth'});
+                toggleMobileMenu();
+              }}
+            >
+              Book Now
+            </Button>
           </div>
         </div>
       )}

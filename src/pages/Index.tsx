@@ -9,6 +9,7 @@ import Gallery from "@/components/Gallery";
 import Testimonials from "@/components/Testimonials";
 import Footer from "@/components/Footer";
 import BackgroundEffects from "@/components/BackgroundEffects";
+import BookingForm from "@/components/BookingForm";
 
 const Index = () => {
   // Smooth scroll effect for anchor links
@@ -43,6 +44,7 @@ const Index = () => {
       <Services />
       <Gallery />
       <Testimonials />
+      <BookingForm />
       <Footer />
     </div>
   );
