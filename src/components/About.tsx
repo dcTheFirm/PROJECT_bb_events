@@ -20,7 +20,7 @@ const About = () => {
               <img src="https://images.unsplash.com/photo-1551024709-8f23befc6f87?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Cocktail close-up" className="w-full h-full object-cover object-center" loading="lazy" />
             </div>
             <div className="absolute -top-6 -left-6 w-32 h-32 md:w-48 md:h-48 rounded-full overflow-hidden border-4 border-cocktail-gold/20 glass-effect">
-              <img alt="Ingredients" loading="lazy" className="w-full h-full object-center object-cover" src="/lovable-uploads/f9d50935-b0c7-46b4-80b4-5d421ceb7c21.jpg" />
+              
             </div>
           </div>
           
