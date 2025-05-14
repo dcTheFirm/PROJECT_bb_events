@@ -23,7 +23,7 @@ const About = () => {
             </div>
             
             <div className="absolute -top-6 -left-6 w-32 h-32 md:w-48 md:h-48 rounded-full overflow-hidden border-4 border-cocktail-gold/20 glass-effect">
-              <img alt="Ingredients" loading="lazy" className="w-full h-full object-center object-cover" src="/Media/founders/i2.jpg" />
+              
             </div>
           </div>
           
