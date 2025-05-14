@@ -119,7 +119,7 @@ const BookingForm = () => {
           className="max-w-4xl mx-auto text-center mb-16"
         >
           <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-            Book An Event
+            Book Your Event
           </h2>
         </motion.div>
         

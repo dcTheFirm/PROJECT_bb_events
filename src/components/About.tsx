@@ -14,13 +14,16 @@ const About = () => {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="relative">
             <div className="aspect-[4/5] w-full rounded-2xl overflow-hidden glass-effect">
-              <img src="https://images.unsplash.com/photo-1470337458703-46ad1756a187?ixlib=rb-1.2.1&auto=format&fit=crop&w=1600&q=80" alt="Bartender crafting a cocktail" className="w-full h-full object-cover object-center" loading="lazy" />
+              
+              <img src="/Media/decores/IMG_4609.webp" alt="Bartender crafting a cocktail" className="w-full h-full object-cover object-center" loading="lazy" />
             </div>
             <div className="absolute -bottom-8 -right-8 w-48 h-48 md:w-64 md:h-64 rounded-2xl overflow-hidden rotate-12 glass-effect border border-white/20">
-              <img src="https://images.unsplash.com/photo-1551024709-8f23befc6f87?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Cocktail close-up" className="w-full h-full object-cover object-center" loading="lazy" />
+             
+              <img src="/Media/Ourworks/DSC06172.webp" alt="Cocktail close-up" className="w-full h-full object-cover object-center" loading="lazy" />
             </div>
+            
             <div className="absolute -top-6 -left-6 w-32 h-32 md:w-48 md:h-48 rounded-full overflow-hidden border-4 border-cocktail-gold/20 glass-effect">
-              <img alt="Ingredients" loading="lazy" className="w-full h-full object-center object-cover" src="/lovable-uploads/f9d50935-b0c7-46b4-80b4-5d421ceb7c21.jpg" />
+              <img alt="Ingredients" loading="lazy" className="w-full h-full object-center object-cover" src="/Media/founders/i2.jpg" />
             </div>
           </div>
           
@@ -29,15 +32,10 @@ const About = () => {
               Crafting Memorable Experiences Since <span className="text-cocktail-gold">2020</span>
             </h3>
             <p className="text-white/70 mb-6 leading-relaxed">
-              Mixology Masters began with a simple idea – to elevate events through exceptional 
-              bartending. What started as a small team of passionate bartenders has grown into 
-              a premier service trusted by clients across the country.
+              Welcome to Bartender Brothers—where craft meets charisma, and every pour is a masterpiece! Founded in 2020 by two bartending visionaries, " Ajay and Anil " ,in the heart of Udaipur. 
             </p>
             <p className="text-white/70 mb-6 leading-relaxed">
-              Our approach combines technical expertise with artistic flair, creating signature 
-              cocktails that delight the senses and become the highlight of any event. From 
-              intimate gatherings to grand celebrations, we bring sophistication and style to 
-              your occasion.
+             we turned our obsession with mixology into an experience that ignites taste buds and sets the vibe for unforgettable moments. We’re not just bartenders—we’re creators, storytellers, and the secret ingredient to every epic celebration.
             </p>
             <div className="grid grid-cols-2 gap-6 mt-10">
               <div className="text-center">

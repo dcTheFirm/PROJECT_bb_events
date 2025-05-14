@@ -6,7 +6,7 @@ import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
 const testimonials = [
   {
     id: 1,
-    name: "Emily Johnson",
+    name: "A",
     role: "Event Planner",
     image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80",
     quote: "Mixology Masters transformed our corporate event with their exceptional service. The custom cocktails were a hit with our clients, and the bartenders were professional, knowledgeable, and engaging."

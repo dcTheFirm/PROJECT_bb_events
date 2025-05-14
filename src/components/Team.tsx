@@ -4,28 +4,40 @@ import { motion } from 'framer-motion';
 
 const teamMembers = [
   {
-    name: "Alex Thompson",
+    name: "A",
     role: "Head Mixologist",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+    image: "/Media/teams/t2.webp",
     description: "With over 10 years of experience, Alex specializes in craft whiskey cocktails and molecular mixology."
   },
   {
-    name: "Sophia Martinez",
+    name: "B",
     role: "Bar Manager",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+    image: "/Media/teams/t4.webp",
     description: "Sophia brings creativity and precision to every event, with expertise in gin-based concoctions and tropical flavors."
   },
   {
-    name: "Marcus Chen",
+    name: "C",
     role: "Senior Bartender",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
     description: "Known for his showmanship and technical precision, Marcus creates stunning, Instagram-worthy drinks."
   },
   {
-    name: "Jamie Wilson",
+    name: "",
     role: "Events Coordinator",
-    image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-    description: "Jamie ensures every event runs smoothly, coordinating staffing and logistics with meticulous attention to detail."
+    image: "/Media/teams/t3.webp",
+    description: "jfklasjidjflkads."
+  },
+  {
+    name: "",
+    role: "Events Coordinator",
+    image: "/Media/teams/t3.webp",
+    description: "jfklasjidjflkads."
+  },
+  {
+    name: "",
+    role: "Events Coordinator",
+    image: "/Media/teams/t3.webp",
+    description: "jfklasjidjflkads."
   }
 ];
 
