@@ -1,18 +1,15 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
+import SectionHeading from './SectionHeading';
 
 function About() {
   return (
-    <section id="about" className="about py-24 bg-black relative overflow-hidden">
+    <section id="about" className="py-24 bg-black relative overflow-hidden">
       <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 font-playfair text-white">
-            <span className="txt-gradient">About Us</span>
-          </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-amber to-purple mx-auto mb-6"></div>
-          <p className="text-white/80 text-lg">Our story of passion for mixology and exceptional service</p>
-        </div>
+        <SectionHeading 
+          title="About Us" 
+          subtitle="Our story of passion for mixology and exceptional service" 
+        />
         
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <motion.div 
@@ -55,8 +52,8 @@ function About() {
             transition={{ duration: 0.8, delay: 0.2 }}
             viewport={{ once: true }}
           >
-            <h3 className="text-2xl md:text-3xl font-playfair font-bold mb-6 text-white">
-              Crafting Memorable Experiences Since <span className="text-gold">2020</span>
+            <h3 className="text-2xl md:text-3xl font-['Playfair_Display'] font-bold mb-6 bg-gradient-to-r from-[#4a90e2] to-[#ff6b6b] bg-clip-text text-transparent">
+              Crafting Memorable Experiences Since <span className="text-[#4a90e2]">2020</span>
             </h3>
             <p className="text-white/70 mb-6 leading-relaxed">
               Welcome to Bartender Brothers—where craft meets charisma, and every pour is a masterpiece! Founded by two bartending visionaries, "Ajay and Anil", in the heart of Udaipur.

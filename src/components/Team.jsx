@@ -1,6 +1,6 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
+import SectionHeading from './SectionHeading';
 
 const teamMembers = [
   {
@@ -33,13 +33,10 @@ function Team() {
   return (
     <section id="team" className="team py-24 bg-gradient-to-b from-black to-dark relative">
       <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 font-playfair text-white">
-            <span className="txt-gradient">Meet Our Team</span>
-          </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-amber to-purple mx-auto mb-6"></div>
-          <p className="text-white/80 text-lg">The talented mixologists behind our exceptional service</p>
-        </div>
+        <SectionHeading 
+          title="Meet Our Team" 
+          subtitle="The talented mixologists behind our exceptional service" 
+        />
         
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {teamMembers.map((member, index) => (

@@ -1,7 +1,7 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Check, ChefHat, Award, Calendar, GlassWater, Coffee } from 'lucide-react';
+import SectionHeading from './SectionHeading';
 
 const services = [
   {
@@ -40,13 +40,10 @@ function Services() {
   return (
     <section id="services" className="services py-24 bg-dark relative">
       <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 font-playfair text-white">
-            <span className="txt-gradient">Our Services</span>
-          </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-amber to-purple mx-auto mb-6"></div>
-          <p className="text-white/80 text-lg">Exceptional mixology services tailored to your needs</p>
-        </div>
+        <SectionHeading 
+          title="Our Services" 
+          subtitle="Exceptional mixology services tailored to your needs" 
+        />
         
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {services.map((service, index) => (
@@ -94,7 +91,9 @@ function Services() {
           
           <div className="grid md:grid-cols-2 gap-8 items-center relative z-10">
             <div>
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 font-playfair">Complete Event Experience</h3>
+              <h3 className="text-2xl md:text-3xl font-bold mb-4 font-playfair bg-gradient-to-r from-[#4a90e2] to-[#ff6b6b] bg-clip-text text-transparent">
+                Complete Event Experience
+              </h3>
               <p className="text-white/70 mb-6">
                 Beyond bartending, we provide a complete solution for your event's beverage needs. 
                 From initial consultation to final service, we handle every aspect with professional care.
