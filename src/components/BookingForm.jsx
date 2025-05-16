@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Users, Clock, MapPin } from 'lucide-react';
@@ -5,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import SectionHeading from './SectionHeading';
 import { toast } from '@/components/ui/sonner';
+
 function BookingForm() {
   const handleSubmit = e => {
     e.preventDefault();
@@ -13,6 +15,7 @@ function BookingForm() {
     });
     e.target.reset();
   };
+
   return <section id="booking" className="booking py-24 bg-black relative overflow-hidden">
       <div className="container mx-auto px-4">
         <SectionHeading title="Book Our Services" subtitle="Let us make your next event extraordinary" />
