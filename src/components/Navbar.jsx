@@ -25,7 +25,7 @@ function Navbar() {
       <div className="container mx-auto px-4 flex justify-between items-center">
         <div className="flex items-center">
           <a href="#home" className="text-white text-2xl md:text-3xl font-bold font-playfair">
-            <span className="text-[#4a90e2]">Bartender</span> Brothers
+            <span className="bg-gradient-to-r from-[#4a90e2] to-[#ff6b6b] bg-clip-text text-transparent">Bartender</span> Brothers
           </a>
         </div>
         
@@ -34,7 +34,7 @@ function Navbar() {
           {['Home', 'About', 'Team', 'Services', 'Gallery', 'Reviews'].map(item => <a key={item} href={`#${item.toLowerCase()}`} className="nav-link text-white text-sm uppercase tracking-wider hover:text-[#4a90e2] transition-colors font-medium">
               {item}
             </a>)}
-          <Button className="btn-book bg-gradient-to-r from-[#4a90e2] to-[#ff6b6b] hover:from-[#ff6b6b] hover:to-[#4a90e2] text-white font-medium" onClick={() => document.getElementById('booking')?.scrollIntoView({
+          <Button className="bg-gradient-to-r from-[#4a90e2] to-[#4a90e2]/80 text-white font-medium" onClick={() => document.getElementById('booking')?.scrollIntoView({
           behavior: 'smooth'
         })}>
             Book Now
@@ -53,7 +53,7 @@ function Navbar() {
             {['Home', 'About', 'Team', 'Services', 'Gallery', 'Reviews'].map(item => <a key={item} href={`#${item.toLowerCase()}`} className="text-white py-2 hover:text-[#4a90e2] transition-colors text-center" onClick={toggleMenu}>
                 {item}
               </a>)}
-            <Button className="bg-gradient-to-r from-[#4a90e2] to-[#ff6b6b] hover:from-[#ff6b6b] hover:to-[#4a90e2] text-white w-full" onClick={() => {
+            <Button className="bg-gradient-to-r from-[#4a90e2] to-[#4a90e2]/80 text-white w-full" onClick={() => {
           document.getElementById('booking')?.scrollIntoView({
             behavior: 'smooth'
           });
