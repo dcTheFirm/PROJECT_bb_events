@@ -2,12 +2,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-interface SectionHeadingProps {
-  title: string;
-  subtitle?: string;
-}
-
-const SectionHeading: React.FC<SectionHeadingProps> = ({ title, subtitle }) => {
+const SectionHeading = ({ title, subtitle }) => {
   return (
     <div className="text-center mb-16">
       <motion.h2 

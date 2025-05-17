@@ -1,10 +1,10 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/sonner';
+import SectionHeading from './SectionHeading';
 
 function Contact() {
   const handleSubmit = (e) => {
@@ -18,13 +18,10 @@ function Contact() {
   return (
     <section id="contact" className="contact py-24 bg-gradient-to-b from-black to-dark relative">
       <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 font-playfair text-white">
-            <span className="txt-gradient">Contact Us</span>
-          </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-amber to-purple mx-auto mb-6"></div>
-          <p className="text-white/80 text-lg">Have questions? We're here to help!</p>
-        </div>
+        <SectionHeading 
+          title="Contact Us" 
+          subtitle="Have questions? We're here to help!" 
+        />
 
         <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
           <motion.div
