@@ -2,9 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+
 function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 50) {
@@ -18,9 +20,11 @@ function Navbar() {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
+
   return <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'py-3 glass-effect shadow-lg' : 'py-6 bg-transparent'}`}>
       <div className="container mx-auto px-4 flex justify-between items-center">
         <div className="flex items-center">
@@ -65,4 +69,5 @@ function Navbar() {
         </div>}
     </header>;
 }
+
 export default Navbar;
