@@ -14,8 +14,8 @@ import BookingForm from "@/components/BookingForm";
 const Index = () => {
   // Smooth scroll effect for anchor links
   useEffect(() => {
-    const handleAnchorClick = (e) => {
-      const target = e.target;
+    const handleAnchorClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
       if (target.tagName === 'A' && target.getAttribute('href')?.startsWith('#')) {
         e.preventDefault();
         const targetId = target.getAttribute('href')?.substring(1);

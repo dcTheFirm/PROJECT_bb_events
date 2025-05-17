@@ -1,7 +1,7 @@
 
-import React from "react";
+import React, { useEffect } from 'react';
 
-function BackgroundEffects() {
+const BackgroundEffects: React.FC = () => {
   return (
     <div className="bubbles">
       <div className="bubble"></div>
@@ -13,6 +13,6 @@ function BackgroundEffects() {
       <div className="bubble"></div>
     </div>
   );
-}
+};
 
 export default BackgroundEffects;

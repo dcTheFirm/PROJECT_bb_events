@@ -1,8 +1,8 @@
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import SectionHeading from './SectionHeading';
 
 const galleryImages = [
   {
@@ -56,7 +56,7 @@ const filterCategories = [
   { id: "setups", label: "Setups" }
 ];
 
-const Gallery = () => {
+function Gallery() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [filter, setFilter] = useState("all");
   
@@ -65,28 +65,31 @@ const Gallery = () => {
     : galleryImages.filter(img => img.category === filter);
   
   return (
-    <section id="gallery" className="py-24 bg-black relative">
+    <section id="gallery" className="gallery py-24 bg-black relative">
       <div className="container mx-auto px-4">
-        <SectionHeading 
-          title="Our Gallery" 
-          subtitle="See our mixology artistry in action" 
-        />
-        
-        {/* Filter buttons */}
-        <div className="flex flex-wrap justify-center gap-2 mb-8">
-          {filterCategories.map(category => (
-            <button
-              key={category.id}
-              onClick={() => setFilter(category.id)}
-              className={`px-4 py-2 rounded-full text-sm transition-all ${
-                filter === category.id 
-                  ? 'bg-gradient-to-r from-[#4a90e2] to-[#ff6b6b] text-white font-medium' 
-                  : 'bg-white/5 text-white/70 hover:bg-white/10'
-              }`}
-            >
-              {category.label}
-            </button>
-          ))}
+        <div className="max-w-4xl mx-auto text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 font-playfair text-white">
+            <span className="txt-gradient">Our Gallery</span>
+          </h2>
+          <div className="w-24 h-1 bg-gradient-to-r from-amber to-purple mx-auto mb-6"></div>
+          <p className="text-white/80 text-lg mb-8">See our mixology artistry in action</p>
+          
+          {/* Filter buttons */}
+          <div className="filters flex flex-wrap justify-center gap-2 mb-8">
+            {filterCategories.map(category => (
+              <button
+                key={category.id}
+                onClick={() => setFilter(category.id)}
+                className={`px-4 py-2 rounded-full text-sm transition-all ${
+                  filter === category.id 
+                    ? 'bg-gold text-black font-medium' 
+                    : 'bg-white/5 text-white/70 hover:bg-white/10'
+                }`}
+              >
+                {category.label}
+              </button>
+            ))}
+          </div>
         </div>
         
         {/* Gallery grid */}
@@ -138,6 +141,6 @@ const Gallery = () => {
       </div>
     </section>
   );
-};
+}
 
 export default Gallery;

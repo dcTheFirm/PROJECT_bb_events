@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -66,11 +67,11 @@
   }
   
   .txt-gradient {
-    @apply bg-gradient-to-r from-[#4a90e2] to-[#ff6b6b] bg-clip-text text-transparent;
+    @apply bg-gradient-to-br from-gold via-white/80 to-amber bg-clip-text text-transparent;
   }
   
   .shadow-glow {
-    @apply shadow-[0_0_15px_rgba(74,144,226,0.5)];
+    @apply shadow-[0_0_15px_rgba(255,215,0,0.5)];
   }
   
   .glass-card {
@@ -223,22 +224,6 @@ html {
 
 .bg-amber {
   background-color: #FFA500;
-}
-
-.text-brand-blue {
-  color: #4a90e2;
-}
-
-.bg-brand-blue {
-  background-color: #4a90e2;
-}
-
-.text-brand-pink {
-  color: #ff6b6b;
-}
-
-.bg-brand-pink {
-  background-color: #ff6b6b;
 }
 
 .text-purple {
