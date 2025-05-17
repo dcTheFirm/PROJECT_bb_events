@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -52,19 +51,24 @@ function Navbar() {
       </div>
       
       {/* Mobile Menu */}
-      {menuOpen && <div className="mob-menu md:hidden absolute top-full left-0 w-full glass-effect border-t border-white/10 shadow-lg animate-fade-in-up">
-          <div className="container mx-auto py-4 px-4 flex flex-col space-y-4">
-            {['Home', 'About', 'Team', 'Services', 'Gallery', 'Reviews'].map(item => <a key={item} href={`#${item.toLowerCase()}`} className="text-white py-2 hover:text-[#4a90e2] transition-colors text-center" onClick={toggleMenu}>
-                {item}
-              </a>)}
-            <Button className="bg-gradient-to-r from-[#4a90e2] to-[#4a90e2]/80 text-white w-full" onClick={() => {
-          document.getElementById('booking')?.scrollIntoView({
-            behavior: 'smooth'
-          });
-          toggleMenu();
-        }}>
-              Book Now
-            </Button>
+      {menuOpen && <div className="mob-menu md:hidden fixed inset-0 z-40 flex flex-col justify-start items-center backdrop-blur-md bg-black/70 animate-fade-in-up">
+          <div className="w-full max-w-md mx-auto mt-4 bg-black/90 rounded-xl shadow-lg p-6 border border-white/10">
+            <div className="flex justify-end mb-4">
+              <button onClick={toggleMenu} aria-label="Close mobile menu" className="text-white"><X size={28} /></button>
+            </div>
+            <div className="flex flex-col space-y-4">
+              {['Home', 'About', 'Team', 'Services', 'Gallery', 'Reviews'].map(item => <a key={item} href={`#${item.toLowerCase()}`} className="text-white py-2 hover:text-[#4a90e2] transition-colors text-center text-lg font-medium" onClick={toggleMenu}>
+                  {item}
+                </a>)}
+              <Button className="bg-gradient-to-r from-[#4a90e2] to-[#4a90e2]/80 text-white w-full mt-2" onClick={() => {
+                document.getElementById('booking')?.scrollIntoView({
+                  behavior: 'smooth'
+                });
+                toggleMenu();
+              }}>
+                Book Now
+              </Button>
+            </div>
           </div>
         </div>}
     </header>;
