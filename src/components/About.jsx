@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
 
@@ -6,10 +5,9 @@ const About = () => {
   return <section id="about" className="py-24 bg-black relative overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 font-['Playfair_Display'] text-white">
-            <span className="text-gradient">About Us</span>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 font-['Playfair_Display'] text-transparent bg-clip-text bg-gradient-to-r from-[#4a90e2] to-[#ff6b6b]">
+            About Us
           </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-cocktail-amber to-cocktail-purple mx-auto mb-6"></div>
           <p className="text-white/80 text-lg">Our story of passion for mixology and exceptional service</p>
         </div>
         
