@@ -4,65 +4,47 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import SectionHeading from './SectionHeading';
 
+const filterCategories = [
+  { id: "elite-evenings", label: "Elite Evenings" },
+  { id: "bar-elegance", label: "Bar Elegance" },
+  { id: "crafted-space", label: "Crafted Space" },
+  { id: "mix-in-motion", label: "Mix in Motion" }
+];
+
 const galleryImages = [
+  // Elite Evenings
   {
     src: "https://images.unsplash.com/photo-1470337458703-46ad1756a187?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
     caption: "Custom Signature Cocktails",
-    category: "drinks"
+    category: "elite-evenings"
   },
+  // Bar Elegance
   {
     src: "https://images.unsplash.com/photo-1536935338788-846bb9981813?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
     caption: "Corporate Event Bar Setup",
-    category: "events"
+    category: "bar-elegance"
   },
+  // Crafted Space
   {
     src: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
     caption: "Expert Mixology in Action",
-    category: "bartenders"
+    category: "crafted-space"
   },
+  // Mix in Motion
   {
     src: "https://images.unsplash.com/photo-1594122230689-45899d9e6f69?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
     caption: "Wedding Reception Service",
-    category: "events"
-  },
-  {
-    src: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
-    caption: "Specialty Craft Cocktail",
-    category: "drinks"
-  },
-  {
-    src: "https://images.unsplash.com/photo-1574096079513-d8259312b785?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
-    caption: "Interactive Cocktail Workshop",
-    category: "workshops"
-  },
-  {
-    src: "https://images.unsplash.com/photo-1527661591475-527312dd65f5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
-    caption: "Premium Mobile Bar",
-    category: "setups"
-  },
-  {
-    src: "https://images.unsplash.com/photo-1560963689-b5682b6440f8?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
-    caption: "Artisanal Mixology Tools",
-    category: "tools"
+    category: "mix-in-motion"
   }
-];
-
-const filterCategories = [
-  { id: "all", label: "All" },
-  { id: "drinks", label: "Drinks" },
-  { id: "events", label: "Events" },
-  { id: "bartenders", label: "Bartenders" },
-  { id: "workshops", label: "Workshops" },
-  { id: "setups", label: "Setups" }
 ];
 
 const Gallery = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [filter, setFilter] = useState("all");
   
-  const filteredImages = filter === "all" 
-    ? galleryImages 
-    : galleryImages.filter(img => img.category === filter);
+  const filteredImages = filter
+    ? galleryImages.filter(img => img.category === filter)
+    : galleryImages;
   
   return (
     <section id="gallery" className="py-24 bg-black relative">
@@ -78,9 +60,9 @@ const Gallery = () => {
             <button
               key={category.id}
               onClick={() => setFilter(category.id)}
-              className={`px-4 py-2 rounded-full text-sm transition-all ${
+              className={`px-4 py-2 rounded-full text-sm transition-all font-medium ${
                 filter === category.id 
-                  ? 'bg-gradient-to-r from-[#4a90e2] to-[#ff6b6b] text-white font-medium' 
+                  ? 'bg-gradient-to-r from-[#4a90e2] to-[#4a90e2]/80 text-white' 
                   : 'bg-white/5 text-white/70 hover:bg-white/10'
               }`}
             >
@@ -92,27 +74,20 @@ const Gallery = () => {
         {/* Gallery grid */}
         <div className="img-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {filteredImages.map((image) => (
-            <motion.div
+            <div
               key={image.src}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.4 }}
-              className="img-item aspect-square overflow-hidden rounded-xl glass-effect cursor-pointer group"
+              className="img-item aspect-square overflow-hidden rounded-xl glass-effect cursor-pointer"
               onClick={() => setSelectedImage(image)}
             >
               <div className="relative h-full w-full overflow-hidden">
                 <img 
                   src={image.src} 
                   alt={image.caption} 
-                  className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
+                  className="h-full w-full object-cover object-center"
                   loading="lazy"
                 />
-                <div className="caption absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
-                  <p className="p-4 text-white font-medium">{image.caption}</p>
-                </div>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
         

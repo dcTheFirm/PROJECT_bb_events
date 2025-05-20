@@ -102,12 +102,12 @@ function Testimonials() {
                     className="w-full flex-shrink-0"
                   >
                     <div className="flex flex-col items-center text-center">
-                      <div className="w-20 h-20 mb-6 rounded-full overflow-hidden border-2 border-gold">
+                      <div className="w-20 h-20 mb-6 rounded-full overflow-hidden border-2 border-[#4a90e2] flex items-center justify-center bg-black">
                         <img 
-                          src={testimonial.image} 
-                          alt={testimonial.name} 
-                          className="w-full h-full object-cover"
-                          loading="lazy"
+                          src="https://cdn-icons-png.flaticon.com/512/847/847969.png" 
+                          alt="Review profile" 
+                          className="w-full h-full object-cover" 
+                          loading="lazy" 
                         />
                       </div>
                       <div className="stars flex mb-4">
@@ -125,7 +125,7 @@ function Testimonials() {
                       </blockquote>
                       <cite className="not-italic">
                         <div className="font-bold text-white text-lg">{testimonial.name}</div>
-                        <div className="text-gold">{testimonial.role}</div>
+                        <div className="text-[#4a90e2]/80">{testimonial.role}</div>
                       </cite>
                     </div>
                   </div>
@@ -141,7 +141,7 @@ function Testimonials() {
                 key={index}
                 onClick={() => goToSlide(index)}
                 className={`dot w-3 h-3 rounded-full transition-colors ${
-                  index === currentIdx ? 'bg-gold' : 'bg-white/20 hover:bg-white/40'
+                  index === currentIdx ? 'bg-[#4a90e2]/80' : 'bg-white/20 hover:bg-white/40'
                 }`}
                 aria-label={`Go to testimonial ${index + 1}`}
               ></button>
