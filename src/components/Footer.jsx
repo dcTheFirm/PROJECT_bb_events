@@ -10,7 +10,7 @@ function Footer() {
         <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-8">
           <div className="flex-1 mb-6 md:mb-0">
             <a href="#home" className="text-white text-2xl font-bold font-playfair mb-2 inline-block">
-              <span className="text-gold">Bartender</span> Brothers
+              <span className="bg-gradient-to-r from-[#4a90e2] to-[#ff6b6b] bg-clip-text text-transparent">Bartender</span> Brothers
             </a>
             <p className="text-white/70 text-sm mb-4 max-w-xs">Elevating events through exceptional bartending services and unforgettable mixology experiences.</p>
             <div className="flex space-x-3 mt-2">
@@ -32,8 +32,10 @@ function Footer() {
               ))}
             </div>
           </div>
-          <div className="flex-1 mb-6 md:mb-0">
-            <h4 className="text-white font-bold uppercase tracking-wider mb-2 text-xs">Navigation</h4>
+          <div className="flex-1 mb-6 md:mb-0 flex flex-col items-center md:items-start">
+            <h4 className="text-2xl md:text-2xl font-bold mb-4 font-['Playfair_Display'] text-[#b497bd] text-center md:text-left">
+              Navigation
+            </h4>
             <ul className="space-y-1">
               {["Home", "About", "Team", "Services", "Gallery", "Contact"].map((item) => (
                 <li key={item}>
@@ -47,8 +49,10 @@ function Footer() {
               ))}
             </ul>
           </div>
-          <div className="flex-1 mb-6 md:mb-0">
-            <h4 className="text-white font-bold uppercase tracking-wider mb-2 text-xs">Contact</h4>
+          <div className="flex-1 mb-6 md:mb-0 flex flex-col items-center md:items-start">
+            <h4 className="text-3xl md:text-2xl font-bold mb-4 font-['Playfair_Display'] text-[#b497bd] text-center md:text-left">
+              Contact
+            </h4>
             <div className="space-y-2 text-sm text-white/70 mb-4">
               <div className="flex items-center gap-2">
                 <MapPin size={14} className="text-gold flex-shrink-0" />
@@ -59,6 +63,10 @@ function Footer() {
                 <a href="tel:+919521157683" className="hover:text-gold transition-colors">
                   +91 9521-157-683
                 </a>
+                <a href="tel:+91 788-765-5745" className="hover:text-gold transition-colors">
+                  +91 788-765-5745
+                </a>
+
               </div>
               <div className="flex items-center gap-2">
                 <Mail size={14} className="text-gold flex-shrink-0" />

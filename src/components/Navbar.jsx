@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Phone } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
 function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showContact, setShowContact] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -22,6 +23,18 @@ function Navbar() {
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
+  };
+
+  const handleContactClick = () => {
+    setShowContact(true);
+    const contactSection = document.getElementById('contact');
+    if (contactSection) {
+      contactSection.scrollIntoView({ behavior: 'smooth' });
+      contactSection.classList.add('ring-4', 'ring-[#4a90e2]/80');
+      setTimeout(() => {
+        contactSection.classList.remove('ring-4', 'ring-[#4a90e2]/80');
+      }, 1200);
+    }
   };
 
   return <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'py-3 glass-effect shadow-lg' : 'py-6 bg-transparent'}`}>
@@ -42,6 +55,14 @@ function Navbar() {
         })}>
             Book Now
           </Button>
+          <button
+            className="ml-2 p-2 rounded-full bg-[#4a90e2]/80 hover:bg-[#4a90e2] transition-colors text-white flex items-center justify-center"
+            aria-label="Show contact info"
+            onClick={handleContactClick}
+            type="button"
+          >
+            <Phone size={20} />
+          </button>
         </nav>
 
         {/* Mobile Menu Button */}
@@ -68,6 +89,17 @@ function Navbar() {
               }}>
                 Book Now
               </Button>
+              <button
+                className="mt-2 p-2 rounded-full bg-[#4a90e2]/80 hover:bg-[#4a90e2] transition-colors text-white flex items-center justify-center w-full"
+                aria-label="Show contact info"
+                onClick={() => {
+                  handleContactClick();
+                  toggleMenu();
+                }}
+                type="button"
+              >
+                <Phone size={20} />
+              </button>
             </div>
           </div>
         </div>}
