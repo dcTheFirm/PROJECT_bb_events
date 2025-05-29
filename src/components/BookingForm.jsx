@@ -1,18 +1,62 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Users, Clock, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import SectionHeading from './SectionHeading';
 import { toast } from '@/components/ui/sonner';
+import { createClient } from '@supabase/supabase-js';
+
+
+// Initialize Supabase client
+const supabaseUrl = 'YOUR_SUPABASE_URL';
+const supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY';
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 function BookingForm() {
-  const handleSubmit = e => {
+  const [guests, setGuests] = useState('');
+  const [location, setLocation] = useState('');
+  const [locationWarning, setLocationWarning] = useState('');
+  const [dateWarning, setDateWarning] = useState('');
+
+  const handleSubmit = async e => {
     e.preventDefault();
+    // Validate guests field
+    if (!guests || Number(guests) < 1 || Number(guests) > 2000) {
+      toast.error("Please enter a valid number of guests (1-2000).");
+      return;
+    }
+
+    // Collect form data
+    const form = e.target;
+    const bookingData = {
+      client_name: form[0].value,
+      email: form[1].value,
+      phone: form[2].value,
+      event_type: form[3].value,
+      event_date: form[4].value,
+      guests: Number(guests),
+      location_text: location,
+      details: form[8].value,
+      status: 'pending'
+    };
+
+    // Insert booking into Supabase
+    const { error } = await supabase.from('bookings').insert([bookingData]);
+    if (error) {
+      toast.error(error.message || "Failed to submit booking.");
+      return;
+    }
+
     toast.success("Booking request sent!", {
       description: "We'll get back to you soon to confirm your booking."
     });
-    e.target.reset();
+
+    setGuests('');
+    setLocation('');
+    setLocationWarning('');
+    setDateWarning('');
+    form.reset();
   };
 
   return <section id="booking" className="booking py-24 bg-black relative overflow-hidden">
@@ -77,15 +121,29 @@ function BookingForm() {
               <div>
                 <div className="relative">
                   <Users className="absolute left-3 top-1/2 -translate-y-1/2 text-white/50" size={16} />
-                  <Input type="number" placeholder="Number of Guests" required className="bg-white/5 border-white/10 text-white placeholder:text-white/40 pl-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2" />
+                  <Input 
+                    type="number" 
+                    placeholder="Number of Guests" 
+                    required 
+                    value={guests}
+                    onChange={e => setGuests(e.target.value)}
+                    className="bg-white/5 border-white/10 text-white placeholder:text-white/40 pl-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2" 
+                  />
                 </div>
               </div>
              
               <div>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-white/50" size={16} />
-                  <Input placeholder="Event Location" required className="bg-white/5 border-white/10 text-white placeholder:text-white/40 pl-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2" />
+                  <Input 
+                    placeholder="Event Location" 
+                    required 
+                    value={location}
+                    onChange={e => setLocation(e.target.value)}
+                    className="bg-white/5 border-white/10 text-white placeholder:text-white/40 pl-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2" 
+                  />
                 </div>
+                {locationWarning && <p className="text-red-500 text-sm mt-1">{locationWarning}</p>}
               </div>
               <div>
                 <textarea placeholder="Additional Details" rows={4} className="w-full rounded-md border border-white/10 bg-white/5 p-3 text-white placeholder:text-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2" />
@@ -110,3 +168,4 @@ function BookingForm() {
     </section>;
 }
 export default BookingForm;
+

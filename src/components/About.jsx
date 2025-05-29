@@ -12,11 +12,11 @@ const About = () => {
           <p className="text-white/80 text-lg">Our story of passion for mixology and exceptional service</p>
         </div>
         
-        <div className="grid md:grid-cols-2 gap-12 items-center">
+        <div className="grid md:grid-cols-2 gap-12 items-center"> 
           <div className="relative">
             <div className="aspect-[4/5] w-full rounded-2xl overflow-hidden glass-effect">
               
-              <img src="" alt="Bartender crafting a cocktail" className="w-full h-full object-cover object-center" loading="lazy" />
+              <img src="D\Media\home_imgaes\home_image.webp" alt="Bartender crafting a cocktail" className="w-full h-full object-cover object-center" loading="lazy" />
             </div>
             <div className="absolute -bottom-8 -right-8 w-48 h-48 md:w-64 md:h-64 rounded-2xl overflow-hidden rotate-12 glass-effect border border-white/20">
              
@@ -30,13 +30,17 @@ const About = () => {
           
           <div>
             <h3 className="text-3xl md:text-4xl font-bold mb-4 font-['Playfair_Display'] text-[#b497bd]">
-              Crafting Memorable Experiences Since <span className="text-white">2020</span>
+              Crafting Memorable Experiences Since <span className="text-white">2019</span>
             </h3>
             <p className="text-white/70 mb-6 leading-relaxed">
-              Welcome to Bartender Brothers—where craft meets charisma, and every pour is a masterpiece! Founded in 2020 by two bartending visionaries, " Ajay and Anil " ,in the heart of Udaipur. 
+              
+Bartender Brothers is a premium bartending service founded by two passionate and skilled brothers, Ajay Choudhary and Anil Kalal. With a combined experience of over 17 years in leading bars and luxury hospitality venues, the duo launched Bartender Brothers in 2019 to bring creativity, professionalism, and flair to event bartending.
+
+
             </p>
             <p className="text-white/70 mb-6 leading-relaxed">
-             we turned our obsession with mixology into an experience that ignites taste buds and sets the vibe for unforgettable moments. We're not just bartenders—we're creators, storytellers, and the secret ingredient to every epic celebration.
+            From intimate gatherings to grand weddings, Bartender Brothers has become known for curated cocktail experiences, thematic bar setups, signature drinks, and a team that ensures every guest has a memorable sip. The company blends world-class mixology with Indian hospitality, offering both alcoholic and non-alcoholic bar solutions tailored to the occasion.
+
             </p>
             <div className="grid grid-cols-2 gap-6 mt-10">
               <div className="text-center">
