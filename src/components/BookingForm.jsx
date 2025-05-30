@@ -1,18 +1,22 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Users, Clock, MapPin } from 'lucide-react';
+import { Calendar, Users, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import SectionHeading from './SectionHeading';
 import { toast } from '@/components/ui/sonner';
-import { supabase } from '@/lib/supabaseClient';
+import { createClient } from '@supabase/supabase-js';
+
+// Initialize Supabase client
+const supabaseUrl = 'https://sivcpdjtgysnryvfbcvw.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpdmNwZGp0Z3lzbnJ5dmZiY3Z3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1MTEyOTQsImV4cCI6MjA2NDA4NzI5NH0.P30L2h9NnsnSccm5NXWeIEMldZ6Tb54uA4zxoaSES1s';
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 function BookingForm() {
   const [guests, setGuests] = useState('');
   const [location, setLocation] = useState('');
   const [locationWarning, setLocationWarning] = useState('');
   const [dateWarning, setDateWarning] = useState('');
-  const [locationsList, setLocationsList] = useState([]);
   const [eventDate, setEventDate] = useState('');
 
   useEffect(() => {
@@ -27,14 +31,6 @@ function BookingForm() {
           console.log('Supabase connection successful:', data);
         }
       });
-  }, []);
-
-  useEffect(() => {
-    async function fetchLocations() {
-      const { data, error } = await supabase.from('locations').select('id, name').eq('is_active', true);
-      if (data) setLocationsList(data);
-    }
-    fetchLocations();
   }, []);
 
   const handleSubmit = async e => {
@@ -53,50 +49,72 @@ function BookingForm() {
     today.setHours(0,0,0,0);
     const selected = new Date(eventDate);
     selected.setHours(0,0,0,0);
-    const nextYear = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
-    if (selected < today) {
-      toast.error('Please select a valid future date.');
+    const minDate = new Date(today);
+    const maxDate = new Date(today);
+    maxDate.setMonth(maxDate.getMonth() + 18); // 1.5 years ahead
+
+    if (selected < minDate) {
+      toast.error('Please select a valid future date. Past dates are not allowed.');
       return;
-    } else if (selected > nextYear) {
-      toast.error('Event date cannot be more than 1 year ahead.');
+    } else if (selected > maxDate) {
+      toast.error('Event date cannot be more than 1.5 years ahead.');
+      return;
+    }
+
+    // Check for max 4 bookings on the same date
+    let { data: sameDateBookings } = await supabase
+      .from('bookings')
+      .select('id')
+      .eq('event_date', eventDate);
+
+    if (sameDateBookings && sameDateBookings.length >= 4) {
+      toast.error("Sorry, we can only accept 4 bookings for the same date. Please select another date.");
       return;
     }
 
     // Collect form data
     const form = e.target;
+    const email = form[1].value;
+    const phone = form[2].value;
+
+    // Check for duplicate email
+    let { data: emailExists } = await supabase
+      .from('bookings')
+      .select('id')
+      .eq('email', email)
+      .limit(1);
+    if (emailExists && emailExists.length > 0) {
+      toast.error("This email has already been used for a booking. Please use a different email.");
+      return;
+    }
+
+    // Check for duplicate phone
+    let { data: phoneExists } = await supabase
+      .from('bookings')
+      .select('id')
+      .eq('phone', phone)
+      .limit(1);
+    if (phoneExists && phoneExists.length > 0) {
+      toast.error("This contact number has already been used for a booking. Please use a different number.");
+      return;
+    }
+
     const bookingData = {
       client_name: form[0].value,
-      email: form[1].value,
-      phone: form[2].value,
+      email,
+      phone,
       event_type: form[3].value,
-      event_date: eventDate,
-      guests: Number(guests),
-      location_text: location,
-      details: form[8].value,
+      event_date: form[4].value,
+      guests: Number(form[5].value),
+      location: form[6].value,
+      details: form[7].value,
       status: 'pending'
     };
 
     // Insert booking into Supabase
     const { error } = await supabase.from('bookings').insert([bookingData]);
     if (error) {
-      let msg = '';
-      if (error.message) {
-        const lowerMsg = error.message.toLowerCase();
-        const emailDup = lowerMsg.includes('email') && (lowerMsg.includes('duplicate') || lowerMsg.includes('already exists') || lowerMsg.includes('unique'));
-        const phoneDup = lowerMsg.includes('phone') && (lowerMsg.includes('duplicate') || lowerMsg.includes('already exists') || lowerMsg.includes('unique'));
-        if (emailDup && phoneDup) {
-          msg = 'A booking with this email and contact number already exists. Please use a different email and phone number.';
-        } else if (emailDup) {
-          msg = 'A booking with this email already exists. Please use a different email.';
-        } else if (phoneDup) {
-          msg = 'A booking with this contact number already exists. Please use a different phone number.';
-        } else {
-          msg = error.message || "Failed to submit booking.";
-        }
-      } else {
-        msg = "Failed to submit booking.";
-      }
-      toast.error(msg);
+      toast.error(error.message || "Failed to submit booking.");
       return;
     }
 
@@ -112,21 +130,17 @@ function BookingForm() {
     form.reset();
   };
 
-  return <section id="booking" className="booking py-24 bg-black relative overflow-hidden">
+  return (
+    <section id="booking" className="booking py-24 bg-black relative overflow-hidden">
       <div className="container mx-auto px-4">
         <SectionHeading title="Book Our Services" subtitle="Let us make your next event extraordinary" />
-        
-        <motion.div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto" initial={{
-        opacity: 0,
-        y: 30
-      }} whileInView={{
-        opacity: 1,
-        y: 0
-      }} transition={{
-        duration: 0.7
-      }} viewport={{
-        once: true
-      }}>
+        <motion.div
+          className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+          viewport={{ once: true }}
+        >
           <div className="glass-effect rounded-xl p-8">
             <h3 className="text-2xl font-playfair font-bold mb-6 text-[#4a90e2]/80">Request a Quote</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -150,7 +164,6 @@ function BookingForm() {
               </div>
               <div>
                 <select required className="bg-white/5 border-white/10 text-white placeholder:text-black/40 w-full rounded-md p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2 appearance-none">
-                  
                   <option value="" disabled selected>Select Event Type</option>
                   <option value="Corporate Event">Corporate Event</option>
                   <option value="Wedding & Anniversary">Wedding & Anniversary</option>
@@ -169,8 +182,9 @@ function BookingForm() {
                     min={new Date().toISOString().split('T')[0]}
                     max={(() => {
                       const today = new Date();
-                      const nextYear = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
-                      return nextYear.toISOString().split('T')[0];
+                      const maxDate = new Date(today);
+                      maxDate.setMonth(maxDate.getMonth() + 18);
+                      return maxDate.toISOString().split('T')[0];
                     })()}
                     value={eventDate}
                     onChange={e => {
@@ -178,12 +192,13 @@ function BookingForm() {
                       const selected = new Date(e.target.value);
                       const today = new Date();
                       today.setHours(0,0,0,0);
-                      const nextYear = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
+                      const maxDate = new Date(today);
+                      maxDate.setMonth(maxDate.getMonth() + 18);
                       selected.setHours(0,0,0,0);
                       if (selected < today) {
-                        setDateWarning('Please select a valid future date.');
-                      } else if (selected > nextYear) {
-                        setDateWarning('Event date cannot be more than 1 year ahead.');
+                        setDateWarning('Please select a valid future date. Past dates are not allowed.');
+                      } else if (selected > maxDate) {
+                        setDateWarning('Event date cannot be more than 1.5 years ahead.');
                       } else {
                         setDateWarning('');
                       }
@@ -202,7 +217,6 @@ function BookingForm() {
                     required
                     value={guests}
                     onChange={e => {
-                      // Prevent entering more than 2000
                       const val = e.target.value;
                       if (val === '' || (Number(val) <= 2000 && Number(val) >= 1)) {
                         setGuests(val);
@@ -214,9 +228,7 @@ function BookingForm() {
                   />
                 </div>
               </div>
-             
               <div>
-                {/* Event Location as a text field instead of dropdown */}
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-white/50" size={16} />
                   <Input
@@ -224,15 +236,7 @@ function BookingForm() {
                     placeholder="Event Location"
                     required
                     value={location}
-                    onChange={e => {
-                      setLocation(e.target.value);
-                      // Show warning if location is not Udaipur
-                      if (e.target.value.trim().toLowerCase() !== 'udaipur') {
-                        setLocationWarning('Charges may vary outside the location Udaipur');
-                      } else {
-                        setLocationWarning('');
-                      }
-                    }}
+                    onChange={e => setLocation(e.target.value)}
                     className={`bg-white/5 border-white/10 text-white placeholder:text-black/40 w-full rounded-md p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2 appearance-none ${locationWarning ? 'border-2 border-white border-solid focus-visible:ring-blue-500' : ''}`}
                   />
                 </div>
@@ -248,21 +252,19 @@ function BookingForm() {
               </Button>
             </form>
           </div>
-          
           <div className="relative">
             <div className="aspect-square rounded-2xl overflow-hidden glass-effect">
               <img src="https://images.unsplash.com/photo-1543007318-45f84c490207?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=934&q=80" alt="Bartender preparing a drink" className="w-full h-full object-cover object-center" loading="lazy" />
             </div>
-            
             <div className="absolute -bottom-6 -right-6 w-40 h-40 rounded-full overflow-hidden border-4 border-gold/20 glass-effect">
               <img src="https://images.unsplash.com/photo-1556703752-83ca8401bc87?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=668&q=80" alt="Cocktail glasses" className="w-full h-full object-cover object-center" loading="lazy" />
             </div>
           </div>
         </motion.div>
       </div>
-    </section>;
+    </section>
+  );
 }
-
 
 export default BookingForm;
 
