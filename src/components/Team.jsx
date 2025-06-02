@@ -18,7 +18,8 @@ function Team() {
   React.useEffect(() => {
     async function fetchTeam() {
       setLoading(true);
-      const { data, error } = await supabase.from('team_members').select('*').order('created_at', { ascending: false });
+      // Order by created_at ascending so new members are added last
+      const { data, error } = await supabase.from('team_members').select('*').order('created_at', { ascending: true });
       if (!error) setTeamMembers(data || []);
       setLoading(false);
     }
@@ -38,7 +39,7 @@ function Team() {
 
   return (
     <section id="team" className="team py-24 bg-gradient-to-b from-black to-dark relative">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto">
         <SectionHeading 
           title="Meet Our Team" 
           subtitle="The talented mixologists behind our exceptional service" 
@@ -51,14 +52,14 @@ function Team() {
           ) : (
             <>
               <button
-                className="absolute left-[-48px] top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white rounded-full p-2 shadow-lg transition-colors"
+                className="absolute left-[-56px] top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white rounded-full p-2 shadow-lg transition-colors"
                 onClick={handlePrev}
                 aria-label="Previous team members"
                 style={{ display: currentIndex > 0 ? 'block' : 'none' }}
               >
                 <ChevronLeft size={28} />
               </button>
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 justify-center">
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-x-15 gap-y-15 justify-center">
                 {visibleMembers.map((member, index) => (
                   <motion.div
                     key={member.id || member.name}
@@ -68,7 +69,7 @@ function Team() {
                     viewport={{ once: true }}
                     className="team-card group relative"
                   >
-                    <div className="relative w-72 h-72 md:w-80 md:h-80 mx-auto overflow-hidden rounded-xl glass-effect">
+                    <div className="relative w-64 h-72 md:w-72 md:h-80 mx-auto overflow-hidden rounded-xl glass-effect">
                       <img 
                         src={member.photo_url || member.image || '/default-profile.png'} 
                         alt={member.name} 
@@ -76,9 +77,9 @@ function Team() {
                         loading="lazy"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
-                      <div className="absolute bottom-0 left-0 w-full p-6">
+                      <div className="absolute bottom-0 left-0 w-full p-4">
                         <h3 className="text-xl font-bold text-white mb-1 font-playfair">{member.name}</h3>
-                        <p className="text-gold font-medium mb-3">{member.role}</p>
+                        <p className="text-gold font-medium mb-2">{member.role}</p>
                         <p className="text-white/80 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">{member.bio || member.description}</p>
                       </div>
                     </div>
@@ -86,7 +87,7 @@ function Team() {
                 ))}
               </div>
               <button
-                className="absolute right-[-48px] top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white rounded-full p-2 shadow-lg transition-colors"
+                className="absolute right-[-56px] top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white rounded-full p-2 shadow-lg transition-colors"
                 onClick={handleNext}
                 aria-label="Next team members"
                 style={{ display: currentIndex + visibleCount < totalMembers ? 'block' : 'none' }}

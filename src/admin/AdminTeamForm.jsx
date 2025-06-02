@@ -6,13 +6,14 @@ import { Input } from '@/components/ui/input';
 const supabaseUrl = 'https://sivcpdjtgysnryvfbcvw.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpdmNwZGp0Z3lzbnJ5dmZiY3Z3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1MTEyOTQsImV4cCI6MjA2NDA4NzI5NH0.P30L2h9NnsnSccm5NXWeIEMldZ6Tb54uA4zxoaSES1s';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
-const BUCKET = 'team'; // Make sure this bucket exists in Supabase Storage
+const BUCKET = 'team';
 
 function AdminTeamForm() {
   const [team, setTeam] = useState([]);
   const [form, setForm] = useState({ name: '', role: '', bio: '', photo_url: '' });
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
   const fileInputRef = useRef();
 
   useEffect(() => {
@@ -20,49 +21,64 @@ function AdminTeamForm() {
   }, []);
 
   async function fetchTeam() {
-    const { data } = await supabase.from('team_members').select('*').order('created_at', { ascending: false });
-    setTeam(data || []);
+    try {
+      const { data, error } = await supabase
+        .from('team_members')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      setTeam(data || []);
+    } catch (err) {
+      alert('Failed to fetch team: ' + err.message);
+    }
   }
 
   async function handleImageUpload(e) {
     const file = e.target.files[0];
     if (!file) return;
     setUploading(true);
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
-    const { data, error } = await supabase.storage.from(BUCKET).upload(fileName, file, {
-      cacheControl: '3600',
-      upsert: false
-    });
-    if (error) {
-      alert('Image upload failed: ' + error.message);
-      setUploading(false);
-      return;
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+      const { error: uploadError } = await supabase.storage.from(BUCKET).upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
+      if (uploadError) throw uploadError;
+      const { data: publicUrlData } = supabase.storage.from(BUCKET).getPublicUrl(fileName);
+      setForm(f => ({ ...f, photo_url: publicUrlData.publicUrl }));
+    } catch (err) {
+      alert('Image upload failed: ' + err.message);
     }
-    // Get public URL
-    const { data: publicUrlData } = supabase.storage.from(BUCKET).getPublicUrl(fileName);
-    setForm(f => ({ ...f, photo_url: publicUrlData.publicUrl }));
     setUploading(false);
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.from('team_members').insert([form]);
-    setLoading(false);
-    if (!error) {
+    try {
+      const { error } = await supabase.from('team_members').insert([form]);
+      if (error) throw error;
       setForm({ name: '', role: '', bio: '', photo_url: '' });
       if (fileInputRef.current) fileInputRef.current.value = '';
       fetchTeam();
-    } else {
-      alert(error.message);
+    } catch (err) {
+      alert(err.message);
     }
+    setLoading(false);
   }
 
   async function handleDelete(id) {
     if (!window.confirm('Delete this team member?')) return;
-    await supabase.from('team_members').delete().eq('id', id);
-    fetchTeam();
+    setDeletingId(id);
+    try {
+      const { error } = await supabase.from('team_members').delete().eq('id', id);
+      if (error) throw error;
+      fetchTeam();
+    } catch (err) {
+      alert('Failed to delete: ' + err.message);
+    }
+    setDeletingId(null);
   }
 
   return (
@@ -116,9 +132,14 @@ function AdminTeamForm() {
                 <div className="text-sm text-gray-600">{member.role}</div>
                 <div className="text-xs text-gray-500">{member.bio}</div>
               </div>
-              <Button variant="destructive" onClick={() => handleDelete(member.id)} className="ml-2">
-                Delete
-              </Button>
+              <button
+                onClick={() => handleDelete(member.id)}
+                disabled={deletingId === member.id}
+                className="ml-2 px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition"
+                type="button"
+              >
+                {deletingId === member.id ? 'Deleting...' : 'Delete'}
+              </button>
             </li>
           ))}
         </ul>
