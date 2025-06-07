@@ -18,8 +18,10 @@ function Team() {
   React.useEffect(() => {
     async function fetchTeam() {
       setLoading(true);
-      // Order by created_at ascending so new members are added last
-      const { data, error } = await supabase.from('team_members').select('*').order('created_at', { ascending: true });
+      // Query the view instead of the table
+      const { data, error } = await supabase
+        .from('team_members_ordered')
+        .select('*');
       if (!error) setTeamMembers(data || []);
       setLoading(false);
     }
@@ -79,8 +81,15 @@ function Team() {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
                       <div className="absolute bottom-0 left-0 w-full p-4">
                         <h3 className="text-xl font-bold text-white mb-1 font-playfair">{member.name}</h3>
-                        <p className="text-gold font-medium mb-2">{member.role}</p>
-                        <p className="text-white/80 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">{member.bio || member.description}</p>
+                        <p
+                          className="font-medium mb-2"
+                          style={{ color: 'rgb(187, 198, 66)' }}
+                        >
+                          {member.role}
+                        </p>
+                        {member.experience !== undefined && member.experience !== null && member.experience !== '' && (
+                          <p className="text-sm text-blue-300 mb-1">{member.experience} years of experience</p>
+                        )}
                       </div>
                     </div>
                   </motion.div>

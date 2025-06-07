@@ -34,7 +34,7 @@ function AdminTeamForm() {
 
   // Team management states
   const [team, setTeam] = useState([]);
-  const [form, setForm] = useState({ name: '', role: '', bio: '', photo_url: '' });
+  const [form, setForm] = useState({ name: '', role: '', photo_url: '', experience: '' });
   const [uploading, setUploading] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const fileInputRef = useRef();
@@ -120,9 +120,14 @@ function AdminTeamForm() {
     e.preventDefault();
     setLoading(true);
     try {
-      const { error } = await supabase.from('team_members').insert([form]);
+      let insertData = { ...form };
+      // Convert experience to integer if present
+      if (insertData.experience !== undefined && insertData.experience !== '') {
+        insertData.experience = parseInt(insertData.experience, 10);
+      }
+      const { error } = await supabase.from('team_members').insert([insertData]);
       if (error) throw error;
-      setForm({ name: '', role: '', bio: '', photo_url: '' });
+      setForm({ name: '', role: '', photo_url: '', experience: '' });
       if (fileInputRef.current) fileInputRef.current.value = '';
       fetchTeam();
     } catch (err) {
@@ -226,9 +231,11 @@ function AdminTeamForm() {
           className="bg-[#18181b] text-gray-100 placeholder-gray-500 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-blue-700"
         />
         <Input
-          placeholder="Bio"
-          value={form.bio}
-          onChange={e => setForm(f => ({ ...f, bio: e.target.value }))}
+          placeholder="Experience (years)"
+          type="number"
+          min="1"
+          value={form.experience}
+          onChange={e => setForm(f => ({ ...f, experience: e.target.value }))}
           className="bg-[#18181b] text-gray-100 placeholder-gray-500 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-blue-700"
         />
         <input
@@ -256,8 +263,15 @@ function AdminTeamForm() {
               )}
               <div className="flex-1">
                 <div className="font-bold text-gray-100 text-base">{member.name}</div>
-                <div className="text-sm text-gray-400">{member.role}</div>
-                <div className="text-xs text-gray-500">{member.bio}</div>
+                <div
+                  className="text-sm"
+                   style={{ color: 'rgb(187, 198, 66)' }}
+                >
+                  {member.role}
+                </div>
+                {member.experience !== undefined && member.experience !== null && member.experience !== '' && (
+                  <div className="text-xs text-blue-300">{member.experience} years experience</div>
+                )}
               </div>
               <button
                 onClick={() => handleDelete(member.id)}

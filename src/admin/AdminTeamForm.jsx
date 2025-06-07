@@ -22,7 +22,7 @@ const ADMIN_EMAIL = 'bartenderbrothers87@gmail.com';
 function AdminTeamForm() {
   // State for team list, form fields, loading states, and file input
   const [team, setTeam] = useState([]);
-  const [form, setForm] = useState({ name: '', role: '', bio: '', photo_url: '' });
+  const [form, setForm] = useState({ name: '', role: '', photo_url: '', experience: '' });
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
@@ -74,19 +74,23 @@ function AdminTeamForm() {
 
   // Handle form submit: add new team member to Supabase
   async function handleSubmit(e) {
-  e.preventDefault();
-  setLoading(true);
-  try {
-    const { error } = await supabase.from('team_members').insert([form]);
-    if (error) throw error;
-    setForm({ name: '', role: '', bio: '', photo_url: '' });
-    if (fileInputRef.current) fileInputRef.current.value = '';
-    fetchTeam();
-  } catch (err) {
-    alert(err.message);
+    e.preventDefault();
+    setLoading(true);
+    try {
+      let insertData = { ...form };
+      if (insertData.experience !== undefined && insertData.experience !== '') {
+        insertData.experience = parseInt(insertData.experience, 10);
+      }
+      const { error } = await supabase.from('team_members').insert([insertData]);
+      if (error) throw error;
+      setForm({ name: '', role: '', photo_url: '', experience: '' });
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      fetchTeam();
+    } catch (err) {
+      alert(err.message);
+    }
+    setLoading(false);
   }
-  setLoading(false);
-}
 
   // Handle delete: remove team member from Supabase and update UI
   async function handleDelete(id) {
@@ -126,9 +130,11 @@ function AdminTeamForm() {
           className="bg-[#18181b] text-gray-100 placeholder-gray-500 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-blue-700"
         />
         <Input
-          placeholder="Bio"
-          value={form.bio}
-          onChange={e => setForm(f => ({ ...f, bio: e.target.value }))}
+          placeholder="Experience (years)"
+          type="number"
+          min="1"
+          value={form.experience}
+          onChange={e => setForm(f => ({ ...f, experience: e.target.value }))}
           className="bg-[#18181b] text-gray-100 placeholder-gray-500 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-blue-700"
         />
         <input
@@ -156,8 +162,15 @@ function AdminTeamForm() {
               )}
               <div className="flex-1">
                 <div className="font-bold text-gray-100 text-base">{member.name}</div>
-                <div className="text-sm text-gray-400">{member.role}</div>
-                <div className="text-xs text-gray-500">{member.bio}</div>
+                <div
+                  className="text-sm"
+                  style={{ color: 'rgb(187, 198, 66)' }}
+                >
+                  {member.role}
+                </div>
+                {member.experience !== undefined && member.experience !== null && member.experience !== '' && (
+                  <div className="text-xs text-blue-300">{member.experience} years experience</div>
+                )}
               </div>
               <button
                 onClick={() => handleDelete(member.id)}
