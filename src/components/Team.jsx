@@ -83,12 +83,12 @@ function Team() {
                         <h3 className="text-xl font-bold text-white mb-1 font-playfair">{member.name}</h3>
                         <p
                           className="font-medium mb-2"
-                          style={{ color: 'rgb(187, 198, 66)' }}
+                          style={{ color: 'rgb(255, 255, 79)' }}
                         >
                           {member.role}
                         </p>
                         {member.experience !== undefined && member.experience !== null && member.experience !== '' && (
-                          <p className="text-sm text-blue-300 mb-1">{member.experience} years of experience</p>
+                          <p className="text-sm text-white-300 mb-1">{member.experience} years of experience</p>
                         )}
                       </div>
                     </div>

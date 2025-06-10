@@ -29,8 +29,8 @@ const services = [
     color: "from-amber to-whiskey"
   },
   {
-    title: "Menu Development",
-    description: "Custom cocktail menu creation for restaurants, bars, and special events.",
+    title: "Brightwood Institute",
+    description: "We also offers coaching and training services through our partnership with Brightwood Institute.",
     icon: Award,
     color: "from-deep-purple to-purple"
   }
@@ -85,6 +85,8 @@ function Services() {
               );
             }
             if (index > 3) return null;
+            // For the first three items, render normally
+            
             return (
               <motion.div
                 key={service.title}
@@ -131,9 +133,9 @@ function Services() {
           
           <div className="grid md:grid-cols-2 gap-8 items-center relative z-10">
             <div>
-              <h3 className="text-2xl md:text-3xl font-bold mb-4 font-playfair bg-gradient-to-r from-[#4a90e2] to-[#ff6b6b] bg-clip-text text-transparent">
-                Complete Event Experience
-              </h3>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 font-['Playfair_Display'] text-[#b497bd]">
+            Complete Event Experience
+          </h2>
               <p className="text-white/70 mb-6">
                 Beyond bartending, we provide a complete solution for your event's beverage needs. 
                 From initial consultation to final service, we handle every aspect with professional care.

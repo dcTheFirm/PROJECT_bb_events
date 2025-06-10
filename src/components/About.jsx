@@ -6,7 +6,7 @@ const About = () => {
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto text-center mb-16">
           
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 font-['Playfair_Display'] text-transparent bg-clip-text bg-gradient-to-r from-[#4a90e2] to-[#ff6b6b]">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 font-['Playfair_Display'] text-[#b497bd]">
             About Us
           </h2>
           <p className="text-white/80 text-lg">Our story of passion for mixology and exceptional service</p>

@@ -265,12 +265,12 @@ function AdminTeamForm() {
                 <div className="font-bold text-gray-100 text-base">{member.name}</div>
                 <div
                   className="text-sm"
-                   style={{ color: 'rgb(187, 198, 66)' }}
+                  style={{ color: 'rgb(255, 255, 79)' }}
                 >
                   {member.role}
                 </div>
                 {member.experience !== undefined && member.experience !== null && member.experience !== '' && (
-                  <div className="text-xs text-blue-300">{member.experience} years experience</div>
+                  <div className="text-xs text-white-300">{member.experience} years experience</div>
                 )}
               </div>
               <button
