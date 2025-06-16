@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check, ChefHat, Award, Calendar, GlassWater, Coffee } from 'lucide-react';
 import SectionHeading from './SectionHeading';
+import { createClient } from '@supabase/supabase-js';
 
 const services = [
   {
@@ -36,7 +37,34 @@ const services = [
   }
 ];
 
+const supabaseUrl = 'https://sivcpdjtgysnryvfbcvw.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpdmNwZGp0Z3lzbnJ5dmZiY3Z3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1MTEyOTQsImV4cCI6MjA2NDA4NzI5NH0.P30L2h9NnsnSccm5NXWeIEMldZ6Tb54uA4zxoaSES1s';
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
 function Services() {
+  const [servicesImage, setServicesImage] = useState({});
+
+  useEffect(() => {
+    async function fetchImage() {
+      const { data, error } = await supabase
+          .from('home-images') // <-- FIXED table name
+        .select('url,position')
+        .eq('section', 'services')
+        .eq('position', 1)
+        .limit(1);
+      if (error) {
+        console.error('Supabase fetch error:', error.message);
+      }
+      const imgMap = {};
+      (data || []).forEach(img => {
+        imgMap[img.position] = img.url;
+      });
+      setServicesImage(imgMap);
+      console.log('Services image by position:', imgMap);
+    }
+    fetchImage();
+  }, []);
+
   return (
     <section id="services" className="services py-24 bg-dark relative">
       <div className="container mx-auto px-4">
@@ -134,8 +162,8 @@ function Services() {
           <div className="grid md:grid-cols-2 gap-8 items-center relative z-10">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold mb-4 font-['Playfair_Display'] text-[#b497bd]">
-            Complete Event Experience
-          </h2>
+                Complete Event Experience
+              </h2>
               <p className="text-white/70 mb-6">
                 Beyond bartending, we provide a complete solution for your event's beverage needs. 
                 From initial consultation to final service, we handle every aspect with professional care.
@@ -157,8 +185,9 @@ function Services() {
               </ul>
             </div>
             <div className="relative aspect-video overflow-hidden rounded-xl">
+              {/* position 1 */}
               <img 
-                src="https://images.unsplash.com/photo-1516997121675-4c2d1684aa3e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80" 
+                src={servicesImage[1] || ""}
                 alt="Full bar setup" 
                 className="w-full h-full object-cover object-center"
                 loading="lazy"

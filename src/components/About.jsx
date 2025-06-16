@@ -1,7 +1,35 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = 'https://sivcpdjtgysnryvfbcvw.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpdmNwZGp0Z3lzbnJ5dmZiY3Z3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1MTEyOTQsImV4cCI6MjA2NDA4NzI5NH0.P30L2h9NnsnSccm5NXWeIEMldZ6Tb54uA4zxoaSES1s';
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const About = () => {
+  const [aboutImages, setAboutImages] = useState({});
+
+  useEffect(() => {
+    async function fetchImages() {
+      const { data, error } = await supabase
+        .from('home-images') 
+        .select('url,position')
+        .eq('section', 'about')
+        .in('position', [1, 2, 3]);
+      if (error) {
+        console.error('Supabase fetch error:', error.message);
+      }
+      // use direct link to the image
+      const imgMap = {};
+      (data || []).forEach(img => {
+        imgMap[img.position] = img.url || '';
+      });
+      setAboutImages(imgMap);
+      console.log('About images by position:', imgMap);
+    }
+    fetchImages();
+  }, []);
+
   return <section id="about" className="py-24 bg-black relative overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto text-center mb-16">
@@ -14,19 +42,25 @@ const About = () => {
         
         <div className="grid md:grid-cols-2 gap-12 items-center"> 
           <div className="relative">
+
             <div className="aspect-[4/5] w-full rounded-2xl overflow-hidden glass-effect">
-              
-              <img src="D\Media\home_imgaes\home_image.webp" alt="Bartender crafting a cocktail" className="w-full h-full object-cover object-center" loading="lazy" />
+              {/* position 1 */}
+              <img src={aboutImages[1] || ""} alt="Bartender crafting a cocktail" className="w-full h-full object-cover object-center" loading="lazy" />
             </div>
+
+
             <div className="absolute -bottom-8 -right-8 w-48 h-48 md:w-64 md:h-64 rounded-2xl overflow-hidden rotate-12 glass-effect border border-white/20">
-             
-              <img src="" alt="Cocktail close-up" className="w-full h-full object-cover object-center" loading="lazy" />
+              {/* position 2 */}
+              <img src={aboutImages[2] || ""} alt="Cocktail close-up" className="w-full h-full object-cover object-center" loading="lazy" />
             </div>
-            
+
             <div className="absolute -top-6 -left-6 w-32 h-32 md:w-48 md:h-48 rounded-full overflow-hidden border-4 border-cocktail-gold/20 glass-effect">
-              
+              {/* position 3 */}
+              <img src={aboutImages[3] || ""} alt="" />
             </div>
           </div>
+          
+
           
           <div>
             <h3 className="text-3xl md:text-4xl font-bold mb-4 font-['Playfair_Display'] text-[#b497bd]">
@@ -44,15 +78,15 @@ Bartender Brothers is a premium bartending service founded by two passionate and
             </p>
             <div className="grid grid-cols-2 gap-6 mt-10">
               <div className="text-center">
-                <div className="text-4xl font-bold text-[#4a90e2]/80 mb-2">500+</div>
+                <div className="text-4xl font-bold text-[#4a90e2]/80 mb-2">200+</div>
                 <div className="text-white/100 text-sm uppercase tracking-wider">Events Catered</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-bold text-[#4a90e2]/80 mb-2">50+</div>
+                <div className="text-4xl font-bold text-[#4a90e2]/80 mb-2">25+</div>
                 <div className="text-white/100 text-sm uppercase tracking-wider">Signature Cocktails</div>
               </div>
               <div className="text-center">
-               <div className="text-4xl font-bold text-[#4a90e2]/80 mb-2">20+</div>
+               <div className="text-4xl font-bold text-[#4a90e2]/80 mb-2">10+</div>
                 <div className="text-white/100 text-sm uppercase tracking-wider">Expert Mixologists</div>
               </div>
               <div className="text-center">

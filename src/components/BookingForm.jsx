@@ -18,6 +18,7 @@ function BookingForm() {
   const [locationWarning, setLocationWarning] = useState('');
   const [dateWarning, setDateWarning] = useState('');
   const [eventDate, setEventDate] = useState('');
+  const [bookingImages, setBookingImages] = useState({});
 
   useEffect(() => {
     supabase
@@ -31,6 +32,26 @@ function BookingForm() {
           console.log('Supabase connection successful:', data);
         }
       });
+  }, []);
+
+  useEffect(() => {
+    async function fetchImages() {
+      const { data, error } = await supabase
+        .from('home-images') // <-- FIXED table name
+        .select('url,position')
+        .eq('section', 'booking')
+        .in('position', [1, 2]);
+      if (error) {
+        console.error('Supabase fetch error:', error.message);
+      }
+      const imgMap = {};
+      (data || []).forEach(img => {
+        imgMap[img.position] = img.url;
+      });
+      setBookingImages(imgMap);
+      console.log('Booking images by position:', imgMap);
+    }
+    fetchImages();
   }, []);
 
   const handleSubmit = async e => {
@@ -254,10 +275,12 @@ function BookingForm() {
           </div>
           <div className="relative">
             <div className="aspect-square rounded-2xl overflow-hidden glass-effect">
-              <img src="https://images.unsplash.com/photo-1543007318-45f84c490207?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=934&q=80" alt="Bartender preparing a drink" className="w-full h-full object-cover object-center" loading="lazy" />
+              {/* position 1 */}
+              <img src={bookingImages[1] || ""} alt="Bartender preparing a drink" className="w-full h-full object-cover object-center" loading="lazy" />
             </div>
             <div className="absolute -bottom-6 -right-6 w-40 h-40 rounded-full overflow-hidden border-4 border-gold/20 glass-effect">
-              <img src="https://images.unsplash.com/photo-1556703752-83ca8401bc87?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=668&q=80" alt="Cocktail glasses" className="w-full h-full object-cover object-center" loading="lazy" />
+              {/* position 2 */}
+              <img src={bookingImages[2] || ""} alt="Cocktail glasses" className="w-full h-full object-cover object-center" loading="lazy" />
             </div>
           </div>
         </motion.div>

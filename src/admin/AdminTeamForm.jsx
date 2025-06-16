@@ -16,23 +16,22 @@ import AdminLogin from './Admin_Login';
 const supabaseUrl = 'https://sivcpdjtgysnryvfbcvw.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpdmNwZGp0Z3lzbnJ5dmZiY3Z3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1MTEyOTQsImV4cCI6MjA2NDA4NzI5NH0.P30L2h9NnsnSccm5NXWeIEMldZ6Tb54uA4zxoaSES1s';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
-const BUCKET = 'team';
 const ADMIN_EMAIL = 'bartenderbrothers87@gmail.com'; 
+const BUCKET = 'team';
 
-function AdminTeamForm() {
+function AdminTeamForm({ adminUser }) {
   // State for team list, form fields, loading states, and file input
   const [team, setTeam] = useState([]);
   const [form, setForm] = useState({ name: '', role: '', photo_url: '', experience: '' });
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
-  const [adminUser, setAdminUser] = useState(null);
   const fileInputRef = useRef();
 
   // Fetch team members on mount
   useEffect(() => {
-    fetchTeam();
-  }, []);
+    if (adminUser) fetchTeam();
+  }, [adminUser]);
 
   // Fetch all team members from Supabase
   async function fetchTeam() {
@@ -106,14 +105,12 @@ function AdminTeamForm() {
     setDeletingId(null);
   }
 
-  // Show login form if not logged in
-  if (!adminUser) {
-    return <AdminLogin onLogin={setAdminUser} />;
-  }
+  // Only render the form if adminUser is present
+  if (!adminUser) return null;
 
   // Render admin panel UI
   return (
-    <div className="max-w-xl mx-auto p-8 bg-[#23272f] rounded-2xl shadow-lg mt-8 border border-gray-800 selection:bg-gray-700 selection:text-white">
+    <section className="mb-12">
       <h2 className="text-2xl font-bold mb-6 text-gray-100">Manage Team Members</h2>
       <form onSubmit={handleSubmit} className="space-y-4 mb-10">
         <Input
@@ -184,7 +181,7 @@ function AdminTeamForm() {
           ))}
         </ul>
       </div>
-    </div>
+    </section>
   );
 }
 
