@@ -3,7 +3,16 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import SectionHeading from './SectionHeading';
 
-// Example images for Showcases and Decores (replace with your real images)
+
+
+//connecting with the supabase. 
+ import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = 'https://sivcpdjtgysnryvfbcvw.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpdmNwZGp0Z3lzbnJ5dmZiY3Z3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1MTEyOTQsImV4cCI6MjA2NDA4NzI5NH0.P30L2h9NnsnSccm5NXWeIEMldZ6Tb54uA4zxoaSES1s';
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+
 const showcaseSubcategories = [
   {
     id: "signature-cocktails",
@@ -299,15 +308,63 @@ const videoGallery = [
 
 const Gallery = () => {
   const [selectedImage, setSelectedImage] = useState(null);
-  const [activeSection, setActiveSection] = useState('showcases'); // 'showcases', 'decores', or 'customizations'
+  const [activeSection, setActiveSection] = useState('showcases');
+
+  // AnimatedSubHeading: light pink line, more space between sub-headings
+  const AnimatedSubHeading = ({ children }) => {
+    const [showLine, setShowLine] = React.useState(false);
+    const [hideLine, setHideLine] = React.useState(false);
+    const ref = React.useRef(null);
+
+    React.useEffect(() => {
+      const node = ref.current;
+      if (!node) return;
+      if (hideLine) return;
+      const observer = new window.IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting && !showLine && !hideLine) {
+            setShowLine(true);
+            setTimeout(() => {
+              setShowLine(false);
+              setHideLine(true);
+            }, 1200);
+          }
+        },
+        { threshold: 0.3 }
+      );
+      observer.observe(node);
+      return () => observer.disconnect();
+    }, [showLine, hideLine]);
+
+    return (
+      <h3
+        ref={ref}
+        className="text-white text-xl font-medium mb-12 relative group inline-block transition-colors duration-300"
+      >
+        <span className="relative inline-block">
+          {children}
+          <span
+            className="absolute left-0 -bottom-1 rounded transition-all duration-300"
+            style={{
+              backgroundColor: 'rgba(236, 72, 153, 0.4)', // light pink with opacity
+              height: '3px',
+              width: showLine ? '100%' : '0',
+              opacity: hideLine ? 0 : 1,
+              transitionProperty: 'width,opacity,background-color',
+            }}
+          />
+        </span>
+      </h3>
+    );
+  };
 
   return (
     <section id="gallery" className="py-24 bg-black relative">
       <div className="container mx-auto px-4">
-        <SectionHeading 
+        {/* <SectionHeading 
           title="Our Gallery" 
           subtitle="See our mixology artistry in action" 
-        />
+        /> */}
 
         {/* Navigation Buttons */}
         <div className="flex justify-center gap-4 mb-12">
@@ -356,10 +413,10 @@ const Gallery = () => {
         {/* Showcases Section */}
         {activeSection === 'showcases' && (
           <div>
-            <div className="space-y-2">
+            <div className="space-y-8">
               {showcaseSubcategories.map(subcat => (
                 <div key={subcat.id}>
-                  <h3 className="text-white text-xl font-medium mb-4">{subcat.label}</h3>
+                  <AnimatedSubHeading>{subcat.label}</AnimatedSubHeading>
                   <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
                     {subcat.images.map((img, idx) => (
                       <div
@@ -389,10 +446,10 @@ const Gallery = () => {
         {/* Decores Section */}
         {activeSection === 'decores' && (
           <div>
-            <div className="space-y-2">
+            <div className="space-y-8">
               {decoreSubcategories.map(subcat => (
                 <div key={subcat.id}>
-                  <h3 className="text-white text-xl font-medium mb-4">{subcat.label}</h3>
+                  <AnimatedSubHeading>{subcat.label}</AnimatedSubHeading>
                   <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
                     {subcat.images.map((img, idx) => (
                       <div
@@ -422,10 +479,10 @@ const Gallery = () => {
         {/* Customizations Section */}
         {activeSection === 'customizations' && (
           <div>
-            <div className="space-y-2">
+            <div className="space-y-8">
               {customizationsSubcategories.map(subcat => (
                 <div key={subcat.id}>
-                  <h3 className="text-white text-xl font-medium mb-4">{subcat.label}</h3>
+                  <AnimatedSubHeading>{subcat.label}</AnimatedSubHeading>
                   <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
                     {subcat.images.map((img, idx) => (
                       <div

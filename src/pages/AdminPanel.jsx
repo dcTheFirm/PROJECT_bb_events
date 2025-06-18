@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import AdminTeamForm from '../admin/AdminTeamForm';
 import HomeImagesForm from '../admin/HomeImagesForm';
 import AdminLogin from '../admin/Admin_Login';
+import AdminGallery from '../admin/AdminGallery';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = 'https://sivcpdjtgysnryvfbcvw.supabase.co';
@@ -36,7 +37,7 @@ function AdminPanel() {
           </button>
         </div>
         <div className="mb-8 text-center text-gray-400 text-base">
-          Manage your team and home page images here.
+          Manage your team, home page images, and gallery here.
         </div>
         <div className="flex justify-center gap-4 mb-8">
           <button
@@ -51,9 +52,16 @@ function AdminPanel() {
           >
             Home Images
           </button>
+          <button
+            className={`px-6 py-2 rounded font-semibold transition-colors ${activeTab === 'gallery' ? 'bg-blue-700 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
+            onClick={() => setActiveTab('gallery')}
+          >
+            Gallery
+          </button>
         </div>
         {activeTab === 'team' && <AdminTeamForm adminUser={adminUser} />}
         {activeTab === 'images' && <HomeImagesForm adminUser={adminUser} />}
+        {activeTab === 'gallery' && <AdminGallery adminUser={adminUser} />}
       </div>
     </div>
   );
