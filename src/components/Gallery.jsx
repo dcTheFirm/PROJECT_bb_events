@@ -22,6 +22,11 @@ const Gallery = () => {
         .select('*')
         .order('position', { ascending: true });
       setSections(data || []);
+      if (data) {
+        data.forEach(sec => {
+          console.log(`Section: '${sec.title}', Category: '${sec.category}'`);
+        });
+      }
     }
     fetchSections();
   }, []);
@@ -98,13 +103,6 @@ const Gallery = () => {
     { key: 'videos', label: 'Videos' },
   ];
 
-  // Map section names to DB titles
-  const sectionTitleMap = {
-    showcases: ["Signature Cocktails", "Live Performance"],
-    decores: ["Bar Setup", "De-Tox Bar", "Champagne Tower", "Custom Themes"],
-    customizations: ["Signature Cocktails", "Personalized Drink Menus", "Fruits & Customs", "Sober Sips"],
-  };
-
   return (
     <section id="gallery" className="py-24 bg-black relative">
       <div className="container mx-auto px-4">
@@ -129,7 +127,7 @@ const Gallery = () => {
         {activeSection !== 'videos' && (
           <div className="space-y-16">
             {sections
-              .filter(sec => sectionTitleMap[activeSection]?.includes(sec.title))
+              .filter(sec => sec.category === activeSection)
               .map(section => (
                 <div key={section.id} className="mb-12">
                   <AnimatedSubHeading>{section.title}</AnimatedSubHeading>
@@ -158,17 +156,39 @@ const Gallery = () => {
                   </div>
                 </div>
               ))}
-            {sections.filter(sec => sectionTitleMap[activeSection]?.includes(sec.title)).length === 0 && (
+            {sections.filter(sec => sec.category === activeSection).length === 0 && (
               <div className="text-center text-gray-400 py-12 text-xl">No sections found for this category.</div>
             )}
           </div>
         )}
-        {/* Videos Section (static for now) */}
+        {/* Videos Section (dynamic) */}
         {activeSection === 'videos' && (
           <div>
             <div className="mb-8">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {/* You can fetch videos from Supabase if you add a table for them */}
+                {(Object.values(images).flat().filter(img => img.is_video && sections.find(sec => sec.id === img.section_id && sec.category === 'videos'))).length === 0 && (
+                  <div className="col-span-full text-center text-gray-400 py-8 text-lg">No videos found for this section.</div>
+                )}
+                {Object.values(images).flat().filter(img => img.is_video && sections.find(sec => sec.id === img.section_id && sec.category === 'videos')).map((video, idx) => (
+                  <div
+                    key={video.id}
+                    className="aspect-video overflow-hidden rounded-xl bg-gray-900 border border-white/10 shadow-lg cursor-pointer group relative hover:scale-105 transition-transform duration-300"
+                    onClick={() => setSelectedImage(video)}
+                    style={{ width: '100%', maxWidth: '350px', height: '200px' }}
+                  >
+                    <video
+                      src={video.image_url}
+                      className="h-full w-full object-cover object-center"
+                      controls={false}
+                      muted
+                      preload="metadata"
+                      poster={video.thumbnail_url || ''}
+                    />
+                    <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-center py-2 text-base font-medium">
+                      {video.subheading}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -178,7 +198,14 @@ const Gallery = () => {
           <DialogContent className="modal-img sm:max-w-4xl bg-black/90 border-gray-800 relative">
             <div className="relative">
               <AspectRatio ratio={16/9} className="overflow-hidden rounded">
-                {selectedImage && (
+                {selectedImage && selectedImage.is_video ? (
+                  <video
+                    src={selectedImage.image_url}
+                    controls
+                    autoPlay
+                    className="h-full w-full object-cover object-center"
+                  />
+                ) : selectedImage && (
                   <img
                     src={selectedImage.image_url}
                     alt={selectedImage.subheading}
