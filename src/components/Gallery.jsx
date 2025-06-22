@@ -13,7 +13,6 @@ const Gallery = () => {
   const [activeSection, setActiveSection] = useState('showcases');
   const [sections, setSections] = useState([]); // fetched from supabase
   const [images, setImages] = useState({}); // { section_id: [images] }
-  const [videos, setVideos] = useState({}); // { section_id: [videos] }
 
   // Fetch sections
   useEffect(() => {
@@ -42,23 +41,6 @@ const Gallery = () => {
       setImages(grouped);
     }
     fetchImages();
-  }, [sections]);
-
-  // Fetch videos for all video sections
-  useEffect(() => {
-    async function fetchVideos() {
-      let { data } = await supabase
-        .from('gallery_videos')
-        .select('*')
-        .order('position', { ascending: true });
-      const grouped = {};
-      (data || []).forEach(vid => {
-        if (!grouped[vid.section_id]) grouped[vid.section_id] = [];
-        grouped[vid.section_id].push(vid);
-      });
-      setVideos(grouped);
-    }
-    fetchVideos();
   }, [sections]);
 
   // AnimatedSubHeading: light pink line, more space between sub-headings
@@ -112,7 +94,6 @@ const Gallery = () => {
     { key: 'showcases', label: 'Showcases' },
     { key: 'decores', label: 'Decores' },
     { key: 'customizations', label: 'Customizations' },
-    { key: 'videos', label: 'Videos' },
   ];
 
   return (
@@ -136,107 +117,51 @@ const Gallery = () => {
           ))}
         </div>
         {/* Dynamic Sections */}
-        {activeSection !== 'videos' && (
-          <div className="space-y-16">
-            {sections
-              .filter(sec => sec.category === activeSection)
-              .map(section => (
-                <div key={section.id} className="mb-12">
-                  <AnimatedSubHeading>{section.title}</AnimatedSubHeading>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
-                    {(images[section.id] || []).length === 0 && (
-                      <div className="col-span-full text-center text-gray-400 py-8 text-lg">No images found for this section.</div>
-                    )}
-                    {(images[section.id] || []).map((img, idx) => (
-                      <div
-                        key={img.id}
-                        className="aspect-square overflow-hidden rounded-xl bg-gray-900 border border-white/10 shadow-lg cursor-pointer group relative hover:scale-105 transition-transform duration-300"
-                        onClick={() => setSelectedImage(img)}
-                        style={{ width: '100%', maxWidth: '300px', height: '250px' }}
-                      >
-                        <img
-                          src={img.image_url}
-                          alt={img.subheading}
-                          className="h-full w-full object-cover object-center"
-                          loading="lazy"
-                        />
-                        <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-center py-2 text-base font-medium">
-                          {img.subheading}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+        <div className="space-y-16">
+          {sections
+            .filter(sec => sec.category === activeSection)
+            .map(section => (
+              <div key={section.id} className="mb-12">
+                <AnimatedSubHeading>{section.title}</AnimatedSubHeading>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
+                  {(images[section.id] || []).length === 0 && (
+                    <div className="col-span-full text-center text-gray-400 py-8 text-lg">No images found for this section.</div>
+                  )}
+                  {(images[section.id] || []).map((img, idx) => (
+                    <div
+                      key={img.id}
+                      className="aspect-square overflow-hidden rounded-xl bg-gray-900 border border-white/10 shadow-lg cursor-pointer group relative hover:scale-105 transition-transform duration-300"
+                      onClick={() => setSelectedImage(img)}
+                      style={{ width: '100%', maxWidth: '300px', height: '250px' }}
+                    >
+                      <img
+                        src={img.image_url}
+                        alt="Gallery image"
+                        className="h-full w-full object-cover object-center"
+                        loading="lazy"
+                      />
+                    </div>
+                  ))}
                 </div>
-              ))}
-            {sections.filter(sec => sec.category === activeSection).length === 0 && (
-              <div className="text-center text-gray-400 py-12 text-xl">No sections found for this category.</div>
-            )}
-          </div>
-        )}
-
-        {/* Videos Section (dynamic) */}
-        {activeSection === 'videos' && (
-          <div className="space-y-16">
-            {sections
-              .filter(sec => sec.category === 'videos')
-              .map(section => (
-                <div key={section.id} className="mb-12">
-                  <AnimatedSubHeading>{section.title}</AnimatedSubHeading>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {(videos[section.id] || []).length === 0 && (
-                      <div className="col-span-full text-center text-gray-400 py-8 text-lg">No videos found for this section.</div>
-                    )}
-                    {(videos[section.id] || []).map((video, idx) => (
-                      <div
-                        key={video.id}
-                        className="aspect-video overflow-hidden rounded-xl bg-gray-900 border border-white/10 shadow-lg cursor-pointer group relative hover:scale-105 transition-transform duration-300"
-                        onClick={() => setSelectedImage(video)}
-                        style={{ width: '100%', maxWidth: '350px', height: '200px' }}
-                      >
-                        <video
-                          src={video.video_url}
-                          className="h-full w-full object-cover object-center"
-                          controls={false}
-                          muted
-                          preload="metadata"
-                          poster={video.thumbnail_url || ''}
-                        />
-                        <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-center py-2 text-base font-medium">
-                          {video.subheading}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            {sections.filter(sec => sec.category === 'videos').length === 0 && (
-              <div className="text-center text-gray-400 py-12 text-xl">No video sections found.</div>
-            )}
-          </div>
-        )}
-        {/* Image/Video modal */}
+              </div>
+            ))}
+          {sections.filter(sec => sec.category === activeSection).length === 0 && (
+            <div className="text-center text-gray-400 py-12 text-xl">No sections found for this category.</div>
+          )}
+        </div>
+        {/* Image modal only */}
         <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
           <DialogContent className="modal-img sm:max-w-4xl bg-black/90 border-gray-800 relative">
             <div className="relative">
               <AspectRatio ratio={16/9} className="overflow-hidden rounded">
-                {selectedImage && selectedImage.video_url ? (
-                  <video
-                    src={selectedImage.video_url}
-                    controls
-                    autoPlay
-                    className="h-full w-full object-cover object-center"
-                  />
-                ) : selectedImage && (
+                {selectedImage && (
                   <img
                     src={selectedImage.image_url}
-                    alt={selectedImage.subheading}
+                    alt="Gallery image"
                     className="h-full w-full object-cover object-center"
                   />
                 )}
               </AspectRatio>
-              {selectedImage && (
-                <p className="text-white mt-4 text-center text-lg font-medium">{selectedImage.subheading}</p>
-              )}
             </div>
           </DialogContent>
         </Dialog>

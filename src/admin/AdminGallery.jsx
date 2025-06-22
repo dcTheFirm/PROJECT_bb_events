@@ -6,13 +6,6 @@ const supabaseUrl = 'https://sivcpdjtgysnryvfbcvw.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpdmNwZGp0Z3lzbnJ5dmZiY3Z3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1MTEyOTQsImV4cCI6MjA2NDA4NzI5NH0.P30L2h9NnsnSccm5NXWeIEMldZ6Tb54uA4zxoaSES1s';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-const NAV_OPTIONS = [
-  { key: 'showcases', label: 'Showcases' },
-  { key: 'decores', label: 'Decores' },
-  { key: 'customizations', label: 'Customizations' },
-  { key: 'videos', label: 'Videos' },
-];
-
 function AdminGallery() {
   const [nav, setNav] = useState('showcases');
   const [sectionCount, setSectionCount] = useState(1);
@@ -22,13 +15,20 @@ function AdminGallery() {
   const [sections, setSections] = useState([]);
   const [images, setImages] = useState([]);
   const [selectedSection, setSelectedSection] = useState(null);
-  const [newImage, setNewImage] = useState({ subheading: '', file: null, position: 1 });
+  const [newImage, setNewImage] = useState({ file: null, position: 1 });
   const [loading, setLoading] = useState(false);
   const [imgLoading, setImgLoading] = useState(false);
   const [localPositions, setLocalPositions] = useState({});
   const [editingTitle, setEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState("");
-  const [error, setError] = useState("");
+
+ const [error, setError] = useState("");
+
+  // Add state for categories
+  const [categories, setCategories] = useState([]);
+  const [newCategory, setNewCategory] = useState({ key: '', label: '' });
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [editedCategory, setEditedCategory] = useState({ key: '', label: '' });
 
   // Fetch sections for selected nav
   useEffect(() => {
@@ -54,6 +54,11 @@ function AdminGallery() {
     }
   }, [images]);
 
+  // Fetch categories from Supabase
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
   async function fetchSections() {
     setLoading(true);
     let { data } = await supabase
@@ -75,6 +80,19 @@ function AdminGallery() {
     console.log('Fetched images for section', sectionId, data);
     setImages(data || []);
     setImgLoading(false);
+  }
+
+  // Fetch categories from Supabase
+  async function fetchCategories() {
+    let { data } = await supabase
+      .from('gallery_categories')
+      .select('*')
+      .order('id', { ascending: true });
+    setCategories(data || []);
+    // Set nav to first category if not set
+    if (data && data.length > 0 && !categories.find(c => c.key === nav)) {
+      setNav(data[0].key);
+    }
   }
 
   // Section creation UI logic
@@ -142,12 +160,10 @@ function AdminGallery() {
     const imageUrl = supabase.storage.from('gallery-images').getPublicUrl(fileName).data.publicUrl;
     const insertResult = await supabase.from('gallery_images').insert({
       section_id: selectedSection.id,
-      subheading: newImage.subheading,
       image_url: imageUrl,
       position: newImage.position,
     });
-    console.log('Inserted image:', insertResult);
-    setNewImage({ subheading: '', file: null, position: 1 });
+    setNewImage({ file: null, position: 1 });
     await fetchImages(selectedSection.id);
     setImgLoading(false);
   }
@@ -164,8 +180,30 @@ function AdminGallery() {
     setImgLoading(false);
   }
 
-  // Add this helper to determine if current nav is videos
-  const isVideoSection = nav === 'videos';
+  // Add category
+  async function handleAddCategory() {
+    if (!newCategory.key.trim() || !newCategory.label.trim()) return;
+    const { error } = await supabase.from('gallery_categories').insert([newCategory]);
+    if (!error) {
+      setNewCategory({ key: '', label: '' });
+      await fetchCategories();
+    }
+  }
+  // Edit category
+  async function handleEditCategory() {
+    if (!editedCategory.key.trim() || !editedCategory.label.trim() || !editingCategory) return;
+    const { error } = await supabase.from('gallery_categories').update(editedCategory).eq('id', editingCategory.id);
+    if (!error) {
+      setEditingCategory(null);
+      setEditedCategory({ key: '', label: '' });
+      await fetchCategories();
+    }
+  }
+  // Delete category
+  async function handleDeleteCategory(id) {
+    await supabase.from('gallery_categories').delete().eq('id', id);
+    await fetchCategories();
+  }
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-[#181a20]">
@@ -175,16 +213,65 @@ function AdminGallery() {
         <aside className="w-64 bg-[#20232a] border-r border-gray-800 flex flex-col items-center py-8 px-4 h-full rounded-xl">
           <h2 className="text-2xl font-bold mb-8 text-gray-100">Manage Gallery </h2>
           <nav className="flex flex-col gap-4 w-full mb-4">
-            {NAV_OPTIONS.map(opt => (
-              <button
-                key={opt.key}
-                onClick={() => setNav(opt.key)}
-                className={`w-full px-6 py-3 rounded-lg text-lg font-semibold transition-all duration-300 text-left ${nav === opt.key ? 'bg-white text-black' : 'bg-white/10 text-white hover:bg-white/20'}`}
-              >
-                {opt.label}
-              </button>
+            {categories.map(cat => (
+              <div key={cat.id} className="flex items-center gap-2">
+                <button
+                  onClick={() => setNav(cat.key)}
+                  className={`w-full px-6 py-3 rounded-lg text-lg font-semibold transition-all duration-300 text-left ${nav === cat.key ? 'bg-white text-black' : 'bg-white/10 text-white hover:bg-white/20'}`}
+                >
+                  {cat.label}
+                </button>
+                <button className="text-xs text-blue-400" onClick={() => { setEditingCategory(cat); setEditedCategory({ key: cat.key, label: cat.label }); }}>Edit</button>
+                <button className="text-xs text-red-400" onClick={() => handleDeleteCategory(cat.id)}>Delete</button>
+              </div>
             ))}
           </nav>
+          {/* Add new category */}
+          <div className="w-full flex flex-col gap-2 mt-4">
+            <input
+              className="px-3 py-2 rounded bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none text-base"
+              type="text"
+              placeholder="Category Key"
+              value={newCategory.key}
+              onChange={e => setNewCategory({ ...newCategory, key: e.target.value })}
+            />
+            <input
+              className="px-3 py-2 rounded bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none text-base"
+              type="text"
+              placeholder="Category Label"
+              value={newCategory.label}
+              onChange={e => setNewCategory({ ...newCategory, label: e.target.value })}
+            />
+            <button
+              className="bg-blue-700 hover:bg-blue-800 text-white py-2 rounded font-semibold text-base transition"
+              onClick={handleAddCategory}
+            >
+              Add Category
+            </button>
+          </div>
+          {/* Edit category modal/inline */}
+          {editingCategory && (
+            <div className="w-full flex flex-col gap-2 mt-4 bg-gray-900 p-3 rounded">
+              <input
+                className="px-3 py-2 rounded bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none text-base"
+                type="text"
+                placeholder="Category Key"
+                value={editedCategory.key}
+                onChange={e => setEditedCategory({ ...editedCategory, key: e.target.value })}
+              />
+              <input
+                className="px-3 py-2 rounded bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none text-base"
+                type="text"
+                placeholder="Category Label"
+                value={editedCategory.label}
+                onChange={e => setEditedCategory({ ...editedCategory, label: e.target.value })}
+              />
+              <div className="flex gap-2">
+                <button className="bg-green-700 hover:bg-green-800 text-white py-2 rounded font-semibold text-base transition flex-1" onClick={handleEditCategory}>Save</button>
+                <button className="bg-gray-700 hover:bg-gray-800 text-white py-2 rounded font-semibold text-base transition flex-1" onClick={() => setEditingCategory(null)}>Cancel</button>
+              </div>
+            </div>
+          )}
         </aside>
         {/* Sections List next to sidebar */}
         <div className="w-80 bg-[#23272f] rounded-xl p-6 border border-gray-700 flex-shrink-0 flex flex-col h-full max-h-[420px] overflow-y-auto">
@@ -212,7 +299,7 @@ function AdminGallery() {
         </div>
         {/* How many sections panel */}
         <div className="flex-1 bg-[#23272f] rounded-xl p-8 border border-gray-700 h-full max-h-[420px] overflow-y-auto">
-          <h3 className="font-semibold text-2xl mb-6 text-gray-200">How many sections do you want in <span className="text-blue-400">{NAV_OPTIONS.find(o => o.key === nav).label}</span>?</h3>
+          <h3 className="font-semibold text-2xl mb-6 text-gray-200">How many sections do you want in <span className="text-blue-400">{(categories.find(c => c.key === nav)?.label || "")}</span>?</h3>
           <input
             className="w-40 mb-4 px-4 py-3 rounded bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none text-lg"
             type="number"
@@ -326,15 +413,10 @@ function AdminGallery() {
                     ))
                   }
                   {images && images.map(img => (
-                    <div key={img.id} className="rounded-xl bg-transparent min-h-[200px] h-[200px] flex flex-col justify-between items-center p-2">
+                    <div key={img.id} className="rounded-xl bg-transparent flex flex-col justify-between items-center p-2">
                       <div className="w-full flex-1 flex items-center justify-center mb-2">
                         {/* For images */}
-                        {!isVideoSection ? (
-                          <img src={img.image_url} alt={img.subheading} className="object-cover w-full h-[120px] rounded" />
-                        ) : (
-                          // For videos
-                          <video src={img.image_url} controls className="object-cover w-full h-[120px] rounded" />
-                        )}
+                        <img src={img.image_url} alt="Gallery media" className="object-cover w-full h-[120px] rounded shadow-none bg-transparent" />
                       </div>
                       <div className="flex flex-col items-center w-full">
                         <label className="text-xs text-gray-300 mb-1">Position</label>
