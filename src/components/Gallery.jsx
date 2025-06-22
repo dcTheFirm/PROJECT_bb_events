@@ -13,6 +13,7 @@ const Gallery = () => {
   const [activeSection, setActiveSection] = useState('showcases');
   const [sections, setSections] = useState([]); // fetched from supabase
   const [images, setImages] = useState({}); // { section_id: [images] }
+  const [videos, setVideos] = useState({}); // { section_id: [videos] }
 
   // Fetch sections
   useEffect(() => {
@@ -22,23 +23,17 @@ const Gallery = () => {
         .select('*')
         .order('position', { ascending: true });
       setSections(data || []);
-      if (data) {
-        data.forEach(sec => {
-          console.log(`Section: '${sec.title}', Category: '${sec.category}'`);
-        });
-      }
     }
     fetchSections();
   }, []);
 
-  // Fetch images for all sections
+  // Fetch images for all sections (except videos)
   useEffect(() => {
     async function fetchImages() {
       let { data } = await supabase
         .from('gallery_images')
         .select('*')
         .order('position', { ascending: true });
-      // Group by section_id
       const grouped = {};
       (data || []).forEach(img => {
         if (!grouped[img.section_id]) grouped[img.section_id] = [];
@@ -47,6 +42,23 @@ const Gallery = () => {
       setImages(grouped);
     }
     fetchImages();
+  }, [sections]);
+
+  // Fetch videos for all video sections
+  useEffect(() => {
+    async function fetchVideos() {
+      let { data } = await supabase
+        .from('gallery_videos')
+        .select('*')
+        .order('position', { ascending: true });
+      const grouped = {};
+      (data || []).forEach(vid => {
+        if (!grouped[vid.section_id]) grouped[vid.section_id] = [];
+        grouped[vid.section_id].push(vid);
+      });
+      setVideos(grouped);
+    }
+    fetchVideos();
   }, [sections]);
 
   // AnimatedSubHeading: light pink line, more space between sub-headings
@@ -161,46 +173,55 @@ const Gallery = () => {
             )}
           </div>
         )}
+
         {/* Videos Section (dynamic) */}
         {activeSection === 'videos' && (
-          <div>
-            <div className="mb-8">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {(Object.values(images).flat().filter(img => img.is_video && sections.find(sec => sec.id === img.section_id && sec.category === 'videos'))).length === 0 && (
-                  <div className="col-span-full text-center text-gray-400 py-8 text-lg">No videos found for this section.</div>
-                )}
-                {Object.values(images).flat().filter(img => img.is_video && sections.find(sec => sec.id === img.section_id && sec.category === 'videos')).map((video, idx) => (
-                  <div
-                    key={video.id}
-                    className="aspect-video overflow-hidden rounded-xl bg-gray-900 border border-white/10 shadow-lg cursor-pointer group relative hover:scale-105 transition-transform duration-300"
-                    onClick={() => setSelectedImage(video)}
-                    style={{ width: '100%', maxWidth: '350px', height: '200px' }}
-                  >
-                    <video
-                      src={video.image_url}
-                      className="h-full w-full object-cover object-center"
-                      controls={false}
-                      muted
-                      preload="metadata"
-                      poster={video.thumbnail_url || ''}
-                    />
-                    <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-center py-2 text-base font-medium">
-                      {video.subheading}
-                    </div>
+          <div className="space-y-16">
+            {sections
+              .filter(sec => sec.category === 'videos')
+              .map(section => (
+                <div key={section.id} className="mb-12">
+                  <AnimatedSubHeading>{section.title}</AnimatedSubHeading>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    {(videos[section.id] || []).length === 0 && (
+                      <div className="col-span-full text-center text-gray-400 py-8 text-lg">No videos found for this section.</div>
+                    )}
+                    {(videos[section.id] || []).map((video, idx) => (
+                      <div
+                        key={video.id}
+                        className="aspect-video overflow-hidden rounded-xl bg-gray-900 border border-white/10 shadow-lg cursor-pointer group relative hover:scale-105 transition-transform duration-300"
+                        onClick={() => setSelectedImage(video)}
+                        style={{ width: '100%', maxWidth: '350px', height: '200px' }}
+                      >
+                        <video
+                          src={video.video_url}
+                          className="h-full w-full object-cover object-center"
+                          controls={false}
+                          muted
+                          preload="metadata"
+                          poster={video.thumbnail_url || ''}
+                        />
+                        <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-center py-2 text-base font-medium">
+                          {video.subheading}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
+                </div>
+              ))}
+            {sections.filter(sec => sec.category === 'videos').length === 0 && (
+              <div className="text-center text-gray-400 py-12 text-xl">No video sections found.</div>
+            )}
           </div>
         )}
-        {/* Image modal */}
+        {/* Image/Video modal */}
         <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
           <DialogContent className="modal-img sm:max-w-4xl bg-black/90 border-gray-800 relative">
             <div className="relative">
               <AspectRatio ratio={16/9} className="overflow-hidden rounded">
-                {selectedImage && selectedImage.is_video ? (
+                {selectedImage && selectedImage.video_url ? (
                   <video
-                    src={selectedImage.image_url}
+                    src={selectedImage.video_url}
                     controls
                     autoPlay
                     className="h-full w-full object-cover object-center"
