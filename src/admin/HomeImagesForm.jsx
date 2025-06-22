@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AdminLogin from './Admin_Login';
-
+import { validateImageSize } from '../lib/validateImageSize';
 
 const supabaseUrl = 'https://sivcpdjtgysnryvfbcvw.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpdmNwZGp0Z3lzbnJ5dmZiY3Z3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1MTEyOTQsImV4cCI6MjA2NDA4NzI5NH0.P30L2h9NnsnSccm5NXWeIEMldZ6Tb54uA4zxoaSES1s';
@@ -42,21 +42,7 @@ function HomeImagesForm({ adminUser }) {
     setLoading(false);
   }
 
-  function handleFileChange(e) {
-    if (!adminUser) return;
-    setError('');
-    const file = e.target.files[0];
-    if (!file) return;
-    if (!file.name.endsWith('.webp')) {
-      setError('Only .webp images are allowed.');
-      return;
-    }
-    if (file.size > 700 * 1024) {
-      setError('Image must be under 700 KB.');
-      return;
-    }
-    setFile(file);
-  }
+ 
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -124,16 +110,26 @@ function HomeImagesForm({ adminUser }) {
     <div className="mt-12">
       <h3 className="font-semibold mb-4 text-lg text-gray-100">Manage Home Page Images</h3>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3 mb-6 bg-[#23272f] p-6 rounded-xl border border-gray-700 shadow">
-        <label className="text-gray-400 text-sm mb-1">
-          Upload Image <span className="italic text-xs">(only .webp, max 600 KB)</span>
-        </label>
+        
         <input
           type="file"
           accept="image/webp"
-          onChange={handleFileChange}
+          onChange={e => {
+            if (!adminUser) return;
+            setError("");
+            const file = e.target.files[0];
+            if (!file) return;
+            if (!validateImageSize(file, 650)) {
+              setError('Only .webp images under 650 KB are accepted.');
+              return;
+            }
+            setFile(file);
+          }}
           className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-800 file:text-blue-400 hover:file:bg-gray-700"
           disabled={!adminUser}
         />
+        {error && <div className="text-xs text-red-400 mt-1">{error}</div>}
+        <div className="text-xs text-gray-400 mt-1">Only .webp images under 650 KB are accepted.</div>
         <div className="flex gap-2">
           <select
             value={section}

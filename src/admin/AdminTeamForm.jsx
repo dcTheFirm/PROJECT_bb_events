@@ -12,6 +12,7 @@ import { createClient } from '@supabase/supabase-js';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AdminLogin from './Admin_Login';
+import { validateImageSize } from '../lib/validateImageSize';
 
 const supabaseUrl = 'https://sivcpdjtgysnryvfbcvw.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpdmNwZGp0Z3lzbnJ5dmZiY3Z3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1MTEyOTQsImV4cCI6MjA2NDA4NzI5NH0.P30L2h9NnsnSccm5NXWeIEMldZ6Tb54uA4zxoaSES1s';
@@ -26,6 +27,7 @@ function AdminTeamForm({ adminUser }) {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+  const [error, setError] = useState("");
   const fileInputRef = useRef();
 
   // Fetch team members on mount
@@ -136,11 +138,22 @@ function AdminTeamForm({ adminUser }) {
         />
         <input
           type="file"
-          accept="image/*"
+          accept="image/webp"
           ref={fileInputRef}
-          onChange={handleImageUpload}
+          onChange={e => {
+            setError("");
+            const file = e.target.files[0];
+            if (!file) return;
+            if (!validateImageSize(file, 650)) {
+              setError('Only .webp images under 650 KB are accepted.');
+              return;
+            }
+            handleImageUpload(e);
+          }}
           className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-800 file:text-blue-400 hover:file:bg-gray-700"
         />
+        {error && <div className="text-xs text-red-400 mt-1">{error}</div>}
+        <div className="text-xs text-gray-400 mt-1">Only .webp images under 650 KB are accepted.</div>
         {uploading && <div className="text-blue-400 text-sm">Uploading image...</div>}
         {form.photo_url && (
           <img src={form.photo_url} alt="Preview" className="w-20 h-20 object-cover rounded-full border mx-auto border-gray-700" />
