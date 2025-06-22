@@ -145,7 +145,7 @@ function AdminGallery() {
     <div className="min-h-screen w-full flex bg-[#181a20]">
       {/* Sidebar for categories */}
       <aside className="w-64 min-h-screen bg-[#20232a] border-r border-gray-800 flex flex-col items-center py-10">
-        <h2 className="text-2xl font-bold mb-10 text-gray-100">Gallery Admin</h2>
+        <h2 className="text-2xl font-bold mb-10 text-gray-100">Manage Gallery </h2>
         <nav className="flex flex-col gap-4 w-full px-6">
           {NAV_OPTIONS.map(opt => (
             <button
@@ -159,12 +159,12 @@ function AdminGallery() {
         </nav>
       </aside>
       {/* Main content */}
-      <main className="flex-1 flex flex-col items-center py-10 px-6">
+      <main className="flex-1 flex flex-col py-10 px-10 bg-[#181a20]">
         {/* Section Count & Bulk Add */}
-        <div className="mb-8 w-full max-w-2xl bg-[#23272f] rounded-xl p-6 border border-gray-700">
-          <h3 className="font-semibold text-xl mb-4 text-gray-200">How many sections do you want in <span className="text-blue-400">{NAV_OPTIONS.find(o => o.key === nav).label}</span>?</h3>
+        <div className="mb-8 w-full bg-[#23272f] rounded-xl p-8 border border-gray-700">
+          <h3 className="font-semibold text-2xl mb-6 text-gray-200">How many sections do you want in <span className="text-blue-400">{NAV_OPTIONS.find(o => o.key === nav).label}</span>?</h3>
           <input
-            className="w-full mb-4 px-4 py-3 rounded bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none text-lg"
+            className="w-40 mb-4 px-4 py-3 rounded bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none text-lg"
             type="number"
             min={1}
             value={sectionCount}
@@ -184,7 +184,7 @@ function AdminGallery() {
                 </div>
               ))}
               <button
-                className="w-full bg-blue-700 hover:bg-blue-800 text-white py-3 rounded font-semibold mt-2 text-lg transition"
+                className="w-40 bg-blue-700 hover:bg-blue-800 text-white py-3 rounded font-semibold mt-2 text-lg transition"
                 onClick={handleAddSections}
                 disabled={loading || sectionInputs.some(s => !s.title)}
               >
@@ -194,11 +194,11 @@ function AdminGallery() {
           )}
         </div>
         {/* Sections and Media */}
-        <div className="flex w-full max-w-7xl gap-10">
+        <div className="flex w-full gap-10">
           {/* Sections List */}
           <div className="w-80 bg-[#23272f] rounded-xl p-6 border border-gray-700 min-h-[400px] flex-shrink-0 flex flex-col">
             <h3 className="font-semibold text-xl mb-6 text-gray-200">Sections List</h3>
-            <div className="flex flex-col gap-4 overflow-y-auto" style={{ maxHeight: '420px' }}>
+            <div className="flex flex-col gap-4 overflow-y-auto hide-scrollbar" style={{ maxHeight: '420px' }}>
               {sections.length === 0 && <div className="text-gray-400">No sections found.</div>}
               {sections.map(section => (
                 <div key={section.id} className={`rounded-xl px-5 py-3 border flex items-center justify-between transition-all duration-200 shadow-sm hover:shadow-lg mb-1 ${selectedSection && selectedSection.id === section.id ? 'border-blue-500 bg-gray-800 scale-105' : 'border-gray-700 bg-[#23272f]'}`}> 
@@ -219,81 +219,53 @@ function AdminGallery() {
               ))}
             </div>
           </div>
-        </div>
-        {/* Media Management Panel below, full width */}
-        {selectedSection && (
-          <div className="w-full max-w-7xl mt-8 bg-[#23272f] rounded-xl p-8 border border-gray-700">
-            <h2 className="text-2xl font-bold mb-6 text-gray-100">{isVideoSection ? 'Videos' : 'Images'} in: <span className="text-blue-400">{selectedSection.title}</span></h2>
-            <div className="flex flex-col md:flex-row gap-8 mb-10">
-              <div className="md:w-1/3">
-                <h3 className="font-semibold text-lg mb-3 text-gray-200">Add {isVideoSection ? 'Video' : 'Image'}</h3>
-                <input
-                  className="w-full mb-3 px-4 py-2 rounded bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none"
-                  type="text"
-                  placeholder={isVideoSection ? 'Video Caption' : 'Image Caption'}
-                  value={newImage.subheading}
-                  onChange={e => setNewImage({ ...newImage, subheading: e.target.value })}
-                />
-                <input
-                  className="w-full mb-3 px-4 py-2 rounded bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none"
-                  type="file"
-                  accept={isVideoSection ? 'video/*' : 'image/*'}
-                  onChange={e => setNewImage({ ...newImage, file: e.target.files[0] })}
-                />
-                <input
-                  className="w-full mb-3 px-4 py-2 rounded bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none"
-                  type="number"
-                  placeholder="Position"
-                  value={newImage.position}
-                  min={1}
-                  onChange={e => setNewImage({ ...newImage, position: Number(e.target.value) })}
-                />
-                <button
-                  className="w-full bg-blue-700 hover:bg-blue-800 text-white py-2 rounded font-semibold mt-2 text-lg transition"
-                  onClick={handleAddImage}
-                  disabled={imgLoading || !newImage.file}
-                >
-                  {imgLoading ? `Adding...` : `Add ${isVideoSection ? 'Video' : 'Image'}`}
-                </button>
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-lg mb-3 text-gray-200">{isVideoSection ? 'Videos List' : 'Images List'}</h3>
-                <div className="mb-3 text-xs text-blue-300">Note: Only 5 {isVideoSection ? 'videos' : 'images'} will be shown in a single row in the gallery.</div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
-                  {imgLoading && <div className="text-gray-400">Loading {isVideoSection ? 'videos' : 'images'}...</div>}
-                  {!imgLoading && images.length === 0 && <div className="text-gray-400">No {isVideoSection ? 'videos' : 'images'} found for this section.</div>}
+          {/* Media Management Panel full width */}
+          <div className="flex-1">
+            {selectedSection && (
+              <div className="w-full">
+                <div className="mb-4">
+                  <div className="text-2xl font-bold text-white mb-2">Images in : <span className="capitalize">{selectedSection.title}</span></div>
+                  <div className="flex flex-row items-center gap-4 mb-2">
+                    <label className="text-lg text-white font-medium">Add Image</label>
+                    <input
+                      className="px-3 py-2 rounded bg-transparent text-white border border-gray-400 focus:outline-none"
+                      type="file"
+                      accept="image/*"
+                      onChange={e => setNewImage({ ...newImage, file: e.target.files[0] })}
+                    />
+                    <button
+                      className="w-28 bg-transparent border border-gray-400 text-white py-2 rounded text-lg font-normal transition"
+                      onClick={handleAddImage}
+                      disabled={imgLoading || !newImage.file}
+                    >
+                      {imgLoading ? 'Uploading...' : 'upload'}
+                    </button>
+                  </div>
+                  <div className="text-lg text-white mt-6 mb-2">
+                    Show Section :
+                  </div>
+                  <div className="text-base text-blue-200 mb-4">
+                    Note: Only 5 images will be shown in a single row in the gallery.
+                  </div>
+                </div>
+                {/* Gallery Grid */}
+                <div className="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 mt-2">
+                  {imgLoading && <div className="text-gray-400 col-span-full">Loading images...</div>}
+                  {!imgLoading && images.length === 0 &&
+                    Array.from({ length: 5 }).map((_, idx) => (
+                      <div key={idx} className="border border-gray-400 rounded-xl bg-transparent min-h-[140px] h-[140px] w-full"></div>
+                    ))
+                  }
                   {images && images.map(img => (
-                    <div key={img.id} className="rounded-xl p-4 border border-gray-700 bg-gray-900 flex flex-col items-center justify-between shadow-lg" style={{ width: '220px', height: '240px' }}>
-                      {isVideoSection ? (
-                        <video src={img.image_url} className="w-full h-32 object-cover rounded mb-2 border border-gray-800" controls />
-                      ) : (
-                        <img src={img.image_url} alt={img.subheading} className="w-full h-32 object-cover rounded mb-2 border border-gray-800" />
-                      )}
-                      <div className="text-gray-200 text-base mb-1 text-center truncate w-full" title={img.subheading}>{img.subheading}</div>
-                      <div className="flex items-center gap-2 mb-2 w-full justify-center">
-                        <span className="text-gray-400 text-xs">Position:</span>
-                        <input
-                          className="w-14 px-2 py-1 rounded bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none text-center"
-                          type="number"
-                          value={img.position}
-                          min={1}
-                          onChange={e => handleUpdateImagePosition(img.id, Number(e.target.value))}
-                        />
-                      </div>
-                      <button
-                        className="w-full bg-red-700 hover:bg-red-800 text-white py-1 rounded text-xs font-semibold transition"
-                        onClick={() => handleDeleteImage(img.id)}
-                        disabled={imgLoading}
-                      >
-                        Delete
-                      </button>
+                    <div key={img.id} className="border border-gray-400 rounded-xl bg-transparent min-h-[140px] h-[140px] w-full flex items-center justify-center overflow-hidden">
+                      <img src={img.image_url} alt={img.subheading} className="object-cover w-full h-full" />
                     </div>
                   ))}
                 </div>
               </div>
-            </div>
+            )}
           </div>
-        )}
+        </div>
       </main>
     </div>
   );

@@ -23,8 +23,8 @@ function AdminPanel() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#18181b] via-[#27272a] to-[#18181b] flex items-center justify-center py-12 px-2 selection:bg-gray-700 selection:text-white">
-      <div className="w-full max-w-2xl bg-[#23272f] shadow-2xl rounded-2xl p-8 border border-gray-800">
+    <div className="min-h-screen w-full bg-gradient-to-br from-[#18181b] via-[#27272a] to-[#18181b] flex flex-col selection:bg-gray-700 selection:text-white">
+      <div className="w-full h-full bg-[#23272f] shadow-2xl rounded-none p-8 border-b border-gray-800">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl font-extrabold text-center text-gray-100 tracking-tight drop-shadow-sm">
             Admin Panel
