@@ -10,28 +10,56 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const Gallery = () => {
   const [selectedImage, setSelectedImage] = useState(null);
-  const [activeSection, setActiveSection] = useState('showcases');
+  const [categories, setCategories] = useState([]); // fetched from supabase
+  const [activeCategory, setActiveCategory] = useState(null);
   const [sections, setSections] = useState([]); // fetched from supabase
   const [images, setImages] = useState({}); // { section_id: [images] }
 
-  // Fetch sections
+  // Fetch categories
   useEffect(() => {
+    async function fetchCategories() {
+      let { data } = await supabase
+        .from('gallery_categories')
+        .select('*')
+        .order('position', { ascending: true });
+      setCategories(data || []);
+      if (data && data.length > 0 && !activeCategory) {
+        setActiveCategory(data[0].key);
+      }
+    }
+    fetchCategories();
+    // eslint-disable-next-line
+  }, []);
+
+  // Fetch sections for the active category
+  useEffect(() => {
+    if (!activeCategory) {
+      setSections([]);
+      return;
+    }
     async function fetchSections() {
       let { data } = await supabase
         .from('gallery_sections')
         .select('*')
+        .eq('category', activeCategory)
         .order('position', { ascending: true });
       setSections(data || []);
     }
     fetchSections();
-  }, []);
+  }, [activeCategory]);
 
-  // Fetch images for all sections (except videos)
+  // Fetch images for all sections
   useEffect(() => {
+    if (!sections.length) {
+      setImages({});
+      return;
+    }
     async function fetchImages() {
+      let sectionIds = sections.map(s => s.id);
       let { data } = await supabase
         .from('gallery_images')
         .select('*')
+        .in('section_id', sectionIds)
         .order('position', { ascending: true });
       const grouped = {};
       (data || []).forEach(img => {
@@ -89,38 +117,34 @@ const Gallery = () => {
     );
   };
 
-  // Section mapping for navigation
-  const sectionTabs = [
-    { key: 'showcases', label: 'Showcases' },
-    { key: 'decores', label: 'Decores' },
-    { key: 'customizations', label: 'Customizations' },
-  ];
-
   return (
     <section id="gallery" className="py-24 bg-black relative">
       <div className="container mx-auto px-4">
         <SectionHeading title="Gallery" subtitle="Our Work & Memories" />
         {/* Navigation Buttons */}
-        <div className="flex justify-center gap-4 mb-12">
-          {sectionTabs.map(tab => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveSection(tab.key)}
-              className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 ${
-                activeSection === tab.key
-                  ? 'bg-white text-black font-bold scale-105'
-                  : 'bg-white/10 text-white hover:bg-white/20'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+        {categories.length > 0 ? (
+          <div className="flex justify-center gap-4 mb-12">
+            {categories.map(cat => (
+              <button
+                key={cat.key}
+                onClick={() => setActiveCategory(cat.key)}
+                className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 ${
+                  activeCategory === cat.key
+                    ? 'bg-white text-black font-bold scale-105'
+                    : 'bg-white/10 text-white hover:bg-white/20'
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center text-gray-400 py-12 text-xl">No categories found. Please add a category in the admin panel.</div>
+        )}
         {/* Dynamic Sections */}
         <div className="space-y-16">
-          {sections
-            .filter(sec => sec.category === activeSection)
-            .map(section => (
+          {sections.length > 0 ? (
+            sections.map(section => (
               <div key={section.id} className="mb-12">
                 <AnimatedSubHeading>{section.title}</AnimatedSubHeading>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
@@ -144,9 +168,9 @@ const Gallery = () => {
                   ))}
                 </div>
               </div>
-            ))}
-          {sections.filter(sec => sec.category === activeSection).length === 0 && (
-            <div className="text-center text-gray-400 py-12 text-xl">No sections found for this category.</div>
+            ))
+          ) : (
+            categories.length > 0 && <div className="text-center text-gray-400 py-12 text-xl">No sections found for this category.</div>
           )}
         </div>
         {/* Image modal only */}

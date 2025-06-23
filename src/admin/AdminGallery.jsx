@@ -26,9 +26,21 @@ function AdminGallery() {
 
   // Add state for categories
   const [categories, setCategories] = useState([]);
-  const [newCategory, setNewCategory] = useState({ key: '', label: '' });
+  const [newCategory, setNewCategory] = useState({ position: 1, label: '' });
   const [editingCategory, setEditingCategory] = useState(null);
-  const [editedCategory, setEditedCategory] = useState({ key: '', label: '' });
+  const [editedCategory, setEditedCategory] = useState({ position: 1, label: '' });
+
+  const [activeTab, setActiveTab] = useState('sections');
+
+  // Add new state for form visibility
+  const [showSectionForm, setShowSectionForm] = useState(false);
+
+  // Add state for image editing
+  const [editingImage, setEditingImage] = useState(null);
+  const [editedImagePosition, setEditedImagePosition] = useState(null);
+
+  // Add state for showing add image form
+  const [showAddImageForm, setShowAddImageForm] = useState(false);
 
   // Fetch sections for selected nav
   useEffect(() => {
@@ -87,7 +99,7 @@ function AdminGallery() {
     let { data } = await supabase
       .from('gallery_categories')
       .select('*')
-      .order('id', { ascending: true });
+      .order('position', { ascending: true });
     setCategories(data || []);
     // Set nav to first category if not set
     if (data && data.length > 0 && !categories.find(c => c.key === nav)) {
@@ -119,6 +131,7 @@ function AdminGallery() {
     }
     setSectionInputs([{ title: '', position: 1 }]); // Reset to one empty section after add
     setSectionCount(1);
+    setShowSectionForm(false); // Hide form after successful add
     await fetchSections();
     setLoading(false);
   }
@@ -138,10 +151,36 @@ function AdminGallery() {
   async function handleUpdateSectionTitle(id, newTitle) {
     if (!newTitle || newTitle.trim() === "") return;
     setLoading(true);
-    await supabase.from('gallery_sections').update({ title: newTitle }).eq('id', id);
-    await fetchSections();
-    setEditingTitle(false);
-    setLoading(false);
+    try {
+      const { error } = await supabase
+        .from('gallery_sections')
+        .update({ title: newTitle.trim() })
+        .eq('id', id);
+      
+      if (error) {
+        console.error('Error updating title:', error);
+        alert('Failed to update title');
+        return;
+      }
+
+      // Update the selected section title locally
+      setSelectedSection(prev => ({
+        ...prev,
+        title: newTitle.trim()
+      }));
+
+      // Update the section in the sections list
+      setSections(prev => prev.map(section => 
+        section.id === id ? { ...section, title: newTitle.trim() } : section
+      ));
+
+      setEditingTitle(false);
+    } catch (error) {
+      console.error('Error updating title:', error);
+      alert('Failed to update title');
+    } finally {
+      setLoading(false);
+    }
   }
   // Image CRUD
   async function handleAddImage() {
@@ -164,6 +203,7 @@ function AdminGallery() {
       position: newImage.position,
     });
     setNewImage({ file: null, position: 1 });
+    setShowAddImageForm(false);
     await fetchImages(selectedSection.id);
     setImgLoading(false);
   }
@@ -182,20 +222,20 @@ function AdminGallery() {
 
   // Add category
   async function handleAddCategory() {
-    if (!newCategory.key.trim() || !newCategory.label.trim()) return;
+    if (!newCategory.label.trim()) return;
     const { error } = await supabase.from('gallery_categories').insert([newCategory]);
     if (!error) {
-      setNewCategory({ key: '', label: '' });
+      setNewCategory({ position: 1, label: '' });
       await fetchCategories();
     }
   }
   // Edit category
   async function handleEditCategory() {
-    if (!editedCategory.key.trim() || !editedCategory.label.trim() || !editingCategory) return;
+    if (!editedCategory.label.trim() || !editingCategory) return;
     const { error } = await supabase.from('gallery_categories').update(editedCategory).eq('id', editingCategory.id);
     if (!error) {
       setEditingCategory(null);
-      setEditedCategory({ key: '', label: '' });
+      setEditedCategory({ position: 1, label: '' });
       await fetchCategories();
     }
   }
@@ -205,263 +245,415 @@ function AdminGallery() {
     await fetchCategories();
   }
 
+  // Add function to handle image edit
+  async function handleUpdateImage(id) {
+    if (!editedImagePosition) return;
+    setImgLoading(true);
+    await supabase.from('gallery_images').update({ position: editedImagePosition }).eq('id', id);
+    setEditingImage(null);
+    setEditedImagePosition(null);
+    await fetchImages(selectedSection.id);
+    setImgLoading(false);
+  }
+
   return (
-    <div className="min-h-screen w-full flex flex-col bg-[#181a20]">
-      {/* Top row: Sidebar, Sections List, and Add Section panel in a single row, not crossing green line */}
-      <div className="flex flex-row items-start w-full max-h-[420px] p-8 gap-8">
-        {/* Sidebar for categories */}
-        <aside className="w-64 bg-[#20232a] border-r border-gray-800 flex flex-col items-center py-8 px-4 h-full rounded-xl">
-          <h2 className="text-2xl font-bold mb-8 text-gray-100">Manage Gallery </h2>
-          <nav className="flex flex-col gap-4 w-full mb-4">
-            {categories.map(cat => (
-              <div key={cat.id} className="flex items-center gap-2">
-                <button
-                  onClick={() => setNav(cat.key)}
-                  className={`w-full px-6 py-3 rounded-lg text-lg font-semibold transition-all duration-300 text-left ${nav === cat.key ? 'bg-white text-black' : 'bg-white/10 text-white hover:bg-white/20'}`}
-                >
-                  {cat.label}
-                </button>
-                <button className="text-xs text-blue-400" onClick={() => { setEditingCategory(cat); setEditedCategory({ key: cat.key, label: cat.label }); }}>Edit</button>
-                <button className="text-xs text-red-400" onClick={() => handleDeleteCategory(cat.id)}>Delete</button>
-              </div>
-            ))}
-          </nav>
-          {/* Add new category */}
-          <div className="w-full flex flex-col gap-2 mt-4">
+    <div className="min-h-screen w-full flex flex-row bg-[#181a20]">
+      {/* Sidebar for categories */}
+      <aside className="w-64 bg-[#20232a] border-r border-gray-800 flex flex-col items-center py-8 px-4 h-full rounded-xl">
+        <h2 className="text-2xl font-bold mb-8 text-gray-100">Manage Gallery</h2>
+        <nav className="flex flex-col gap-4 w-full mb-4">
+          {categories.map(cat => (
+            <div key={cat.id} className="flex items-center gap-2">
+              <button
+                onClick={() => { setNav(cat.key); setActiveTab('sections'); }}
+                className={`w-full px-6 py-3 rounded-lg text-lg font-semibold transition-all duration-300 text-left ${nav === cat.key ? 'bg-white text-black' : 'bg-white/10 text-white hover:bg-white/20'}`}
+              >
+                {cat.label}
+              </button>
+              <button className="text-xs text-blue-400" onClick={() => { setEditingCategory(cat); setEditedCategory({ position: cat.position, label: cat.label }); }}>Edit</button>
+              <button className="text-xs text-red-400" onClick={() => handleDeleteCategory(cat.id)}>Delete</button>
+            </div>
+          ))}
+        </nav>
+        {/* Add new category */}
+        <div className="w-full flex flex-col gap-2 mt-4">
+          <input
+            className="px-3 py-2 rounded bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none text-base"
+            type="number"
+            min="1"
+            placeholder="Category Position"
+            value={newCategory.position}
+            onChange={e => setNewCategory({ ...newCategory, position: parseInt(e.target.value) || 1 })}
+          />
+          <input
+            className="px-3 py-2 rounded bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none text-base"
+            type="text"
+            placeholder="Category Label"
+            value={newCategory.label}
+            onChange={e => setNewCategory({ ...newCategory, label: e.target.value })}
+          />
+          <button
+            className="bg-blue-700 hover:bg-blue-800 text-white py-2 rounded font-semibold text-base transition"
+            onClick={handleAddCategory}
+          >
+            Add Category
+          </button>
+        </div>
+        {/* Edit category modal/inline */}
+        {editingCategory && (
+          <div className="w-full flex flex-col gap-2 mt-4 bg-gray-900 p-3 rounded">
             <input
               className="px-3 py-2 rounded bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none text-base"
-              type="text"
-              placeholder="Category Key"
-              value={newCategory.key}
-              onChange={e => setNewCategory({ ...newCategory, key: e.target.value })}
+              type="number"
+              min="1"
+              placeholder="Category Position"
+              value={editedCategory.position}
+              onChange={e => setEditedCategory({ ...editedCategory, position: parseInt(e.target.value) || 1 })}
             />
             <input
               className="px-3 py-2 rounded bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none text-base"
               type="text"
               placeholder="Category Label"
-              value={newCategory.label}
-              onChange={e => setNewCategory({ ...newCategory, label: e.target.value })}
+              value={editedCategory.label}
+              onChange={e => setEditedCategory({ ...editedCategory, label: e.target.value })}
             />
-            <button
-              className="bg-blue-700 hover:bg-blue-800 text-white py-2 rounded font-semibold text-base transition"
-              onClick={handleAddCategory}
-            >
-              Add Category
-            </button>
-          </div>
-          {/* Edit category modal/inline */}
-          {editingCategory && (
-            <div className="w-full flex flex-col gap-2 mt-4 bg-gray-900 p-3 rounded">
-              <input
-                className="px-3 py-2 rounded bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none text-base"
-                type="text"
-                placeholder="Category Key"
-                value={editedCategory.key}
-                onChange={e => setEditedCategory({ ...editedCategory, key: e.target.value })}
-              />
-              <input
-                className="px-3 py-2 rounded bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none text-base"
-                type="text"
-                placeholder="Category Label"
-                value={editedCategory.label}
-                onChange={e => setEditedCategory({ ...editedCategory, label: e.target.value })}
-              />
-              <div className="flex gap-2">
-                <button className="bg-green-700 hover:bg-green-800 text-white py-2 rounded font-semibold text-base transition flex-1" onClick={handleEditCategory}>Save</button>
-                <button className="bg-gray-700 hover:bg-gray-800 text-white py-2 rounded font-semibold text-base transition flex-1" onClick={() => setEditingCategory(null)}>Cancel</button>
-              </div>
+            <div className="flex gap-2">
+              <button className="bg-green-700 hover:bg-green-800 text-white py-2 rounded font-semibold text-base transition flex-1" onClick={handleEditCategory}>Save</button>
+              <button className="bg-gray-700 hover:bg-gray-800 text-white py-2 rounded font-semibold text-base transition flex-1" onClick={() => setEditingCategory(null)}>Cancel</button>
             </div>
-          )}
-        </aside>
-        {/* Sections List next to sidebar */}
-        <div className="w-80 bg-[#23272f] rounded-xl p-6 border border-gray-700 flex-shrink-0 flex flex-col h-full max-h-[420px] overflow-y-auto">
-          <h3 className="font-semibold text-xl mb-6 text-gray-200">Sections List</h3>
-          <div className="flex flex-col gap-4 overflow-y-auto hide-scrollbar" style={{ maxHeight: '320px' }}>
-            {sections.length === 0 && <div className="text-gray-400">No sections found.</div>}
-            {sections.map(section => (
-              <div key={section.id} className={`rounded-xl px-5 py-3 border flex items-center justify-between transition-all duration-200 shadow-sm hover:shadow-lg mb-1 ${selectedSection && selectedSection.id === section.id ? 'border-blue-500 bg-gray-800' : 'border-gray-700 bg-[#23272f]'}`}> 
-                <button
-                  className="text-lg font-bold text-blue-400 hover:underline text-left flex-1 truncate"
-                  onClick={() => setSelectedSection(section)}
-                  style={{wordBreak: 'break-word'}}>
-                  {section.title || section.name}
-                </button>
-                <button
-                  className="text-xs text-red-400 hover:underline ml-4"
-                  onClick={() => handleDeleteSection(section.id)}
-                  disabled={loading}
-                >
-                  Delete
-                </button>
-              </div>
-            ))}
           </div>
+        )}
+      </aside>
+      {/* Main content with tabs */}
+      <div className="flex-1 flex flex-col p-8">
+        {/* Tabs */}
+        <div className="flex gap-4 mb-6">
+          <button
+            className={`px-6 py-2 rounded-t-lg font-semibold ${activeTab === 'sections' ? 'bg-white text-black' : 'bg-gray-700 text-white'}`}
+            onClick={() => setActiveTab('sections')}
+          >
+            Sections
+          </button>
+          <button
+            className={`px-6 py-2 rounded-t-lg font-semibold ${activeTab === 'images' ? 'bg-white text-black' : 'bg-gray-700 text-white'} ${!selectedSection ? 'opacity-50 cursor-not-allowed' : ''}`}
+            onClick={() => selectedSection && setActiveTab('images')}
+            disabled={!selectedSection}
+          >
+            Images
+          </button>
         </div>
-        {/* How many sections panel */}
-        <div className="flex-1 bg-[#23272f] rounded-xl p-8 border border-gray-700 h-full max-h-[420px] overflow-y-auto">
-          <h3 className="font-semibold text-2xl mb-6 text-gray-200">How many sections do you want in <span className="text-blue-400">{(categories.find(c => c.key === nav)?.label || "")}</span>?</h3>
-          <input
-            className="w-40 mb-4 px-4 py-3 rounded bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none text-lg"
-            type="number"
-            min={1}
-            value={sectionCount}
-            onChange={e => handleSectionCountChange(Number(e.target.value))}
-          />
-          {sectionInputs.length > 0 && (
-            <div className="space-y-4">
-              {sectionInputs.map((s, idx) => (
-                <div key={idx} className="flex gap-3 items-center">
-                  <input
-                    className="flex-1 px-4 py-3 rounded bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none text-lg"
-                    type="text"
-                    placeholder={`Section ${idx + 1} Title`}
-                    value={s.title}
-                    onChange={e => handleSectionInputChange(idx, 'title', e.target.value)}
-                  />
-                </div>
-              ))}
-              <button
-                className="w-40 bg-blue-700 hover:bg-blue-800 text-white py-3 rounded font-semibold mt-2 text-lg transition"
-                onClick={handleAddSections}
-                disabled={loading || sectionInputs.some(s => !s.title)}
-              >
-                {loading ? 'Adding...' : 'Add Sections'}
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-
-
-      {/* Main content below (gallery/media) remains unchanged */}
-      <main className="flex-1 flex flex-col py-10 px-10 bg-[#181a20]">
-        {/* Sections and Media */}
-        <div className="flex w-full gap-10">
-          {/* Media Management Panel full width */}
-          <div className="flex-1">
-            {selectedSection && (
-              <div className="w-full">
-                <div className="mb-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="text-2xl font-bold text-white">
-                      {editingTitle ? (
-                        <input
-                          className="text-2xl font-bold bg-gray-800 text-white border border-gray-500 rounded px-2 py-1 focus:outline-none"
-                          value={editedTitle}
-                          autoFocus
-                          onChange={e => setEditedTitle(e.target.value)}
-                          onBlur={() => handleUpdateSectionTitle(selectedSection.id, editedTitle)}
-                          onKeyDown={e => {
-                            if (e.key === 'Enter') handleUpdateSectionTitle(selectedSection.id, editedTitle);
-                          }}
-                        />
-                      ) : (
-                        <>
-                          <span className="capitalize">{selectedSection.title}</span>
-                          <button
-                            className="ml-3 px-2 py-0.5 text-xs text-gray-400 hover:text-blue-400 border border-gray-500 rounded transition-all align-middle"
-                            onClick={() => {
-                              setEditingTitle(true);
-                              setEditedTitle(selectedSection.title);
-                            }}
-                            title="Edit Title"
-                          >
-                            edit...
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex flex-row items-center gap-2 mb-2">
-                    <label className="text-base text-white font-medium mr-2">Add Image</label>
-                    <input
-                      className="px-2 py-1 rounded bg-transparent text-white border border-gray-400 focus:outline-none text-sm"
-                      type="file"
-                      accept="image/webp"
-                      onChange={e => {
-                        setError("");
-                        const file = e.target.files[0];
-                        if (!file) return;
-                        if (!validateImageSize(file, 650)) {
-                          setError('Only .webp images under 650 KB are accepted.');
-                          return;
-                        }
-                        setNewImage({ ...newImage, file });
-                      }}
-                    />
+        <div className="bg-[#23272f] rounded-b-xl p-8 border border-gray-700 flex-1">
+          {/* Sections Tab */}
+          {activeTab === 'sections' && (
+            <>
+              <h3 className="font-semibold text-xl mb-6 text-gray-200">Sections in <span className="text-blue-400">{(categories.find(c => c.key === nav)?.label || "")}</span></h3>
+              <div className="flex flex-col gap-4 mb-8">
+                {sections.length === 0 && <div className="text-gray-400">No sections found.</div>}
+                {sections.map(section => (
+                  <div key={section.id} className={`rounded-xl px-5 py-3 border flex items-center justify-between transition-all duration-200 shadow-sm hover:shadow-lg mb-1 ${selectedSection && selectedSection.id === section.id ? 'border-blue-500 bg-gray-800' : 'border-gray-700 bg-[#23272f]'}`}> 
                     <button
-                      className="px-4 py-1 bg-transparent border border-gray-400 text-white rounded text-base font-normal transition ml-2"
-                      onClick={handleAddImage}
-                      disabled={imgLoading || !newImage.file}
+                      className="text-lg font-bold text-blue-400 hover:underline text-left flex-1 truncate"
+                      onClick={() => { setSelectedSection(section); setActiveTab('images'); }}
+                      style={{wordBreak: 'break-word'}}>
+                      {section.title || section.name}
+                    </button>
+                    <button
+                      className="text-xs text-red-400 hover:underline ml-4"
+                      onClick={() => handleDeleteSection(section.id)}
+                      disabled={loading}
                     >
-                      {imgLoading ? 'Uploading...' : 'upload'}
+                      Delete
                     </button>
                   </div>
-                  {error && <div className="text-xs text-red-400 mt-1">{error}</div>}
-                  <div className="text-xs text-gray-400 mt-1">Only .webp images under 650 KB are accepted.</div>
-                  
-                  <div className="text-sm text-blue-200 mb-2">
-                    Note: Only 5 images will be shown in a single row in the gallery.
-                  </div>
-                </div>
-                {/* Gallery Grid */}
-                <div className="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 mt-2">
-                  {imgLoading && <div className="text-gray-400 col-span-full">Loading images...</div>}
-                  {!imgLoading && images.length === 0 &&
-                    Array.from({ length: 5 }).map((_, idx) => (
-                      <div key={idx} className="border border-gray-400 rounded-xl bg-transparent min-h-[200px] h-[200px] flex flex-col justify-end items-center p-2"></div>
-                    ))
-                  }
-                  {images && images.map(img => (
-                    <div key={img.id} className="rounded-xl bg-transparent flex flex-col justify-between items-center p-2">
-                      <div className="w-full flex-1 flex items-center justify-center mb-2">
-                        {/* For images */}
-                        <img src={img.image_url} alt="Gallery media" className="object-cover w-full h-[120px] rounded shadow-none bg-transparent" />
-                      </div>
-                      <div className="flex flex-col items-center w-full">
-                        <label className="text-xs text-gray-300 mb-1">Position</label>
-                        <input
-                          type="number"
-                          min={1}
-                          value={localPositions[img.id] ?? img.position}
-                          className="w-16 px-2 py-1 rounded bg-gray-800 text-white border border-gray-500 text-xs text-center focus:outline-none"
-                          onChange={e => setLocalPositions(pos => ({ ...pos, [img.id]: Number(e.target.value) }))}
-                        />
+                ))}
+              </div>
+              {/* Add Section Form */}
+              <div className="mt-8">
+                {!showSectionForm ? (
+                  <button
+                    onClick={() => setShowSectionForm(true)}
+                    className="w-full py-4 px-6 rounded-xl border-2 border-dashed border-gray-600 text-gray-400 hover:border-blue-500 hover:text-blue-500 transition-all duration-300 text-lg font-medium flex items-center justify-center gap-2"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    Click to Add Sections
+                  </button>
+                ) : (
+                  <div className="bg-gray-900 rounded-xl p-6 border border-gray-700 animate-in slide-in-from-top duration-300">
+                    <div className="flex justify-between items-center mb-4">
+                      <h4 className="font-semibold text-lg text-gray-100">Add Section</h4>
+                      <button 
+                        onClick={() => setShowSectionForm(false)}
+                        className="text-gray-400 hover:text-gray-200"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                    <input
+                      className="w-40 mb-4 px-4 py-3 rounded bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none text-lg"
+                      type="number"
+                      min={1}
+                      value={sectionCount}
+                      onChange={e => handleSectionCountChange(Number(e.target.value))}
+                    />
+                    {sectionInputs.length > 0 && (
+                      <div className="space-y-4">
+                        {sectionInputs.map((s, idx) => (
+                          <div key={idx} className="flex gap-3 items-center">
+                            <input
+                              className="flex-1 px-4 py-3 rounded bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none text-lg"
+                              type="text"
+                              placeholder={`Section ${idx + 1} Title`}
+                              value={s.title}
+                              onChange={e => handleSectionInputChange(idx, 'title', e.target.value)}
+                            />
+                          </div>
+                        ))}
                         <button
-                          className="mt-2 px-3 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700 transition"
-                          onClick={() => handleDeleteImage(img.id)}
-                          disabled={imgLoading}
+                          className="w-40 bg-blue-700 hover:bg-blue-800 text-white py-3 rounded font-semibold mt-2 text-lg transition"
+                          onClick={handleAddSections}
+                          disabled={loading || sectionInputs.some(s => !s.title)}
                         >
-                          Delete
+                          {loading ? 'Adding...' : 'Add Sections'}
                         </button>
                       </div>
-                    </div>
-                  ))}
-                </div>
-                {/* Single Set Position button for all media */}
-                {images.length > 0 && (
-                  <div className="flex justify-end mt-4">
-                    <button
-                      className="px-4 py-2 bg-blue-600 text-white rounded text-sm font-semibold hover:bg-blue-700 transition"
-                      disabled={imgLoading || !Object.keys(localPositions).some(id => localPositions[id] !== (images.find(img => img.id == id)?.position))}
-                      onClick={async () => {
-                        setImgLoading(true);
-                        const updates = images.filter(img => localPositions[img.id] !== img.position);
-                        for (const img of updates) {
-                          await handleUpdateImagePosition(img.id, localPositions[img.id]);
-                        }
-                        setImgLoading(false);
-                      }}
-                    >
-                      Set Position
-                    </button>
+                    )}
                   </div>
                 )}
               </div>
-            )}
-          </div>
+            </>
+          )}
+          {/* Images Tab */}
+          {activeTab === 'images' && (
+            <>
+              {selectedSection ? (
+                <div className="w-full">
+                  <div className="flex justify-between items-center mb-6">
+                    <div className="flex items-center gap-2">
+                      <div className="text-2xl font-bold text-white">
+                        {editingTitle ? (
+                          <form 
+                            onSubmit={(e) => {
+                              e.preventDefault();
+                              handleUpdateSectionTitle(selectedSection.id, editedTitle);
+                            }}
+                            className="flex items-center gap-2"
+                          >
+                            <input
+                              className="text-2xl font-bold bg-gray-800 text-white border border-gray-500 rounded px-2 py-1 focus:outline-none focus:border-blue-500"
+                              value={editedTitle}
+                              autoFocus
+                              onChange={e => setEditedTitle(e.target.value)}
+                              onBlur={() => {
+                                if (editedTitle.trim() !== selectedSection.title) {
+                                  handleUpdateSectionTitle(selectedSection.id, editedTitle);
+                                } else {
+                                  setEditingTitle(false);
+                                }
+                              }}
+                              onKeyDown={e => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  handleUpdateSectionTitle(selectedSection.id, editedTitle);
+                                } else if (e.key === 'Escape') {
+                                  setEditingTitle(false);
+                                  setEditedTitle(selectedSection.title);
+                                }
+                              }}
+                            />
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="submit"
+                                className="p-1 text-green-400 hover:text-green-300 transition-colors"
+                                disabled={loading}
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                              </button>
+                              <button
+                                type="button"
+                                className="p-1 text-gray-400 hover:text-gray-300 transition-colors"
+                                onClick={() => {
+                                  setEditingTitle(false);
+                                  setEditedTitle(selectedSection.title);
+                                }}
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
+                            </div>
+                          </form>
+                        ) : (
+                          <>
+                            <span className="capitalize">{selectedSection.title}</span>
+                            <button
+                              className="ml-3 px-2 py-0.5 text-xs text-gray-400 hover:text-blue-400 border border-gray-500 rounded transition-all align-middle"
+                              onClick={() => {
+                                setEditingTitle(true);
+                                setEditedTitle(selectedSection.title);
+                              }}
+                              title="Edit Title"
+                            >
+                              edit...
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    {!showAddImageForm && (
+                      <button
+                        onClick={() => setShowAddImageForm(true)}
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition-colors flex items-center gap-2"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                        Add Image
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Add Image Form */}
+                  {showAddImageForm && (
+                    <div className="mb-6 p-4 bg-gray-800/40 rounded-xl border border-gray-700">
+                      <div className="flex justify-between items-center mb-4">
+                        <h4 className="text-lg font-semibold text-white">Add New Image</h4>
+                        <button 
+                          onClick={() => setShowAddImageForm(false)}
+                          className="text-gray-400 hover:text-gray-200"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <input
+                          className="flex-1 px-3 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:border-blue-500"
+                          type="file"
+                          accept="image/webp"
+                          onChange={e => {
+                            setError("");
+                            const file = e.target.files[0];
+                            if (!file) return;
+                            if (!validateImageSize(file, 650)) {
+                              setError('Only .webp images under 650 KB are accepted.');
+                              return;
+                            }
+                            setNewImage({ ...newImage, file });
+                          }}
+                        />
+                        <button
+                          className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          onClick={handleAddImage}
+                          disabled={imgLoading || !newImage.file}
+                        >
+                          {imgLoading ? 'Uploading...' : 'Upload Image'}
+                        </button>
+                      </div>
+                      {error && <div className="text-xs text-red-400 mt-2">{error}</div>}
+                      <div className="text-xs text-gray-400 mt-2">Only .webp images under 650 KB are accepted.</div>
+                      <div className="text-sm text-blue-200 mt-1">Note: Only 5 images will be shown in a single row in the gallery.</div>
+                    </div>
+                  )}
+
+                  {/* Gallery Grid */}
+                  <div className="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                    {imgLoading && <div className="text-gray-400 col-span-full">Loading images...</div>}
+                    {!imgLoading && images.length === 0 && (
+                      <div className="col-span-full text-center py-12">
+                        <h3 className="text-xl font-semibold text-gray-400">No images found for this section.</h3>
+                        <p className="text-gray-500 mt-2">Click the Add Image button to upload some images.</p>
+                      </div>
+                    )}
+                    {images && images.map(img => (
+                      <div key={img.id} className="bg-gray-800/40 rounded-xl border border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 p-4">
+                        <div className="w-full aspect-square mb-4 overflow-hidden rounded-lg">
+                          <img 
+                            src={img.image_url} 
+                            alt="Gallery media" 
+                            className="w-full h-full object-cover hover:scale-110 transition-transform duration-300" 
+                          />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <label className="text-xs text-gray-400 block mb-1">Position</label>
+                              {editingImage === img.id ? (
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="number"
+                                    min={1}
+                                    value={editedImagePosition}
+                                    className="w-20 px-2 py-1 rounded bg-gray-700 text-white border border-gray-600 text-sm focus:outline-none focus:border-blue-500 transition-colors"
+                                    onChange={e => setEditedImagePosition(Number(e.target.value))}
+                                  />
+                                  <button
+                                    className="p-1 text-green-400 hover:text-green-300 transition-colors"
+                                    onClick={() => handleUpdateImage(img.id)}
+                                    disabled={imgLoading}
+                                  >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                  </button>
+                                  <button
+                                    className="p-1 text-gray-400 hover:text-gray-300 transition-colors"
+                                    onClick={() => {
+                                      setEditingImage(null);
+                                      setEditedImagePosition(null);
+                                    }}
+                                  >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm text-white">{img.position}</span>
+                                  <button
+                                    className="p-1 text-blue-400 hover:text-blue-300 transition-colors"
+                                    onClick={() => {
+                                      setEditingImage(img.id);
+                                      setEditedImagePosition(img.position);
+                                    }}
+                                  >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                            <button
+                              className="px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg text-xs hover:bg-red-500/30 transition-colors flex items-center gap-1"
+                              onClick={() => handleDeleteImage(img.id)}
+                              disabled={imgLoading}
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-gray-400">Select a section to manage images.</div>
+              )}
+            </>
+          )}
         </div>
-      </main>
+      </div>
     </div>
   );
 }

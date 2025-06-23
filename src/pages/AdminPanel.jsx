@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import AdminTeamForm from '../admin/AdminTeamForm';
-import HomeImagesForm from '../admin/HomeImagesForm';
+import AdminTeam from '../admin/AdminTeam';
+import AdminHome from '../admin/AdminHome';
 import AdminLogin from '../admin/Admin_Login';
 import AdminGallery from '../admin/AdminGallery';
 import { createClient } from '@supabase/supabase-js';
@@ -18,9 +18,7 @@ function AdminPanel() {
     setAdminUser(null);
   };
 
-  if (!adminUser) {
-    return <AdminLogin onLogin={setAdminUser} />;
-  }
+  if (!adminUser) return <AdminLogin onLogin={setAdminUser} />;
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-[#18181b] via-[#27272a] to-[#18181b] flex flex-col selection:bg-gray-700 selection:text-white">
@@ -59,8 +57,8 @@ function AdminPanel() {
             Gallery
           </button>
         </div>
-        {activeTab === 'team' && <AdminTeamForm adminUser={adminUser} />}
-        {activeTab === 'images' && <HomeImagesForm adminUser={adminUser} />}
+        {activeTab === 'team' && <AdminTeam adminUser={adminUser} />}
+        {activeTab === 'images' && <AdminHome adminUser={adminUser} />}
         {activeTab === 'gallery' && <AdminGallery adminUser={adminUser} />}
       </div>
     </div>
