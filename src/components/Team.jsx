@@ -2,11 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import SectionHeading from './SectionHeading';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-  import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = 'https://sivcpdjtgysnryvfbcvw.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpdmNwZGp0Z3lzbnJ5dmZiY3Z3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1MTEyOTQsImV4cCI6MjA2NDA4NzI5NH0.P30L2h9NnsnSccm5NXWeIEMldZ6Tb54uA4zxoaSES1s';
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { supabase } from '../lib/supabaseClient';
 
 function Team() {
   const [teamMembers, setTeamMembers] = React.useState([]);
@@ -75,15 +71,16 @@ function Team() {
                       <img 
                         src={member.photo_url || member.image || '/default-profile.png'} 
                         alt={member.name} 
-                        className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-110"
+                        className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
                         loading="lazy"
+                        style={{ filter: 'brightness(0.7)' }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
                       <div className="absolute bottom-0 left-0 w-full p-4">
                         <h3 className="text-xl font-bold text-white mb-1 font-playfair">{member.name}</h3>
                         <p
                           className="font-medium mb-2"
-                          style={{ color: 'rgb(255, 255, 79)' }}
+                          style={{ color: 'rgb(212, 215, 109)' }}
                         >
                           {member.role}
                         </p>

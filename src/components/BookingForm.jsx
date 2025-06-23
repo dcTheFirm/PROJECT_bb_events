@@ -5,12 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import SectionHeading from './SectionHeading';
 import { toast } from '@/components/ui/sonner';
-import { createClient } from '@supabase/supabase-js';
-
-// Initialize Supabase client
-const supabaseUrl = 'https://sivcpdjtgysnryvfbcvw.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpdmNwZGp0Z3lzbnJ5dmZiY3Z3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1MTEyOTQsImV4cCI6MjA2NDA4NzI5NH0.P30L2h9NnsnSccm5NXWeIEMldZ6Tb54uA4zxoaSES1s';
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { supabase } from '../lib/supabaseClient';
 
 function BookingForm() {
   const [guests, setGuests] = useState('');
@@ -184,8 +179,8 @@ function BookingForm() {
                 />
               </div>
               <div>
-                <select required className="bg-white/5 border-white/10 text-white placeholder:text-black/40 w-full rounded-md p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2 appearance-none">
-                  <option value="" disabled selected>Select Event Type</option>
+                <select defaultValue="" required className="bg-white/5 border-white/10 text-white placeholder:text-black/40 w-full rounded-md p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2 appearance-none">
+                  <option value="" disabled>Select Event Type</option>
                   <option value="Corporate Event">Corporate Event</option>
                   <option value="Wedding & Anniversary">Wedding & Anniversary</option>
                   <option value="Birthday">Birthday</option>

@@ -2,44 +2,67 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check, ChefHat, Award, Calendar, GlassWater, Coffee } from 'lucide-react';
 import SectionHeading from './SectionHeading';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../lib/supabaseClient';
 
 const services = [
   {
     title: "Private Events",
     description: "Full-service bar setup for private parties, birthdays, and intimate gatherings.",
     icon: GlassWater,
-    color: "from-gold to-amber"
+    color: "from-gold to-amber",
+    features: [
+      "Professional staff",
+      "Quality ingredients",
+      "Custom menus"
+    ]
   },
   {
     title: "Corporate Events",
     description: "Professional bartending services for corporate functions and business gatherings.",
     icon: Coffee,
-    color: "from-purple to-deep-purple"
+    color: "from-purple to-deep-purple",
+    
+      features: [
+        "Branded cocktail experiences",
+        "Efficient large-group service",
+        "Flexible setup for formal settings"
+      ]
+    
   },
   {
     title: "Weddings",
     description: "Customized bar services to match your special day, including signature cocktails.",
     icon: Calendar,
-    color: "from-burgundy to-purple"
+    color: "from-burgundy to-purple",
+    features: [
+      "Signature couple’s cocktails",
+  "Themed decor coordination",
+  "Experienced wedding bartenders"
+    ]
   },
   {
     title: "Cocktail Workshops",
     description: "Interactive mixology classes and cocktail-making workshops for groups.",
     icon: ChefHat,
-    color: "from-amber to-whiskey"
+    color: "from-amber to-whiskey",
+    features: [
+      "Interactive classes",
+      "Group activities",
+      "Professional mixologists"
+    ]
   },
   {
     title: "Brightwood Institute",
     description: "We also offers coaching and training services through our partnership with Brightwood Institute.",
     icon: Award,
-    color: "from-deep-purple to-purple"
+    color: "from-deep-purple to-purple",
+    features: [
+      "Coaching & training",
+      "Industry certification",
+      "Expert instructors"
+    ]
   }
 ];
-
-const supabaseUrl = 'https://sivcpdjtgysnryvfbcvw.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpdmNwZGp0Z3lzbnJ5dmZiY3Z3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1MTEyOTQsImV4cCI6MjA2NDA4NzI5NH0.P30L2h9NnsnSccm5NXWeIEMldZ6Tb54uA4zxoaSES1s';
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 function Services() {
   const [servicesImage, setServicesImage] = useState({});
@@ -94,18 +117,12 @@ function Services() {
                       <h3 className="text-xl font-bold text-white mb-4 font-playfair">{srv.title}</h3>
                       <p className="text-white/70 mb-6">{srv.description}</p>
                       <ul className="feature-list space-y-2">
-                        <li className="flex items-center text-white/60">
-                          <Check size={18} className="text-gold mr-2" />
-                          <span>Professional staff</span>
-                        </li>
-                        <li className="flex items-center text-white/60">
-                          <Check size={18} className="text-gold mr-2" />
-                          <span>Quality ingredients</span>
-                        </li>
-                        <li className="flex items-center text-white/60">
-                          <Check size={18} className="text-gold mr-2" />
-                          <span>Custom menus</span>
-                        </li>
+                        {srv.features.map((feature) => (
+                          <li key={feature} className="flex items-center text-white/60">
+                            <Check size={18} className="text-gold mr-2" />
+                            <span>{feature}</span>
+                          </li>
+                        ))}
                       </ul>
                     </motion.div>
                   ))}
@@ -130,18 +147,12 @@ function Services() {
                 <h3 className="text-xl font-bold text-white mb-4 font-playfair">{service.title}</h3>
                 <p className="text-white/70 mb-6">{service.description}</p>
                 <ul className="feature-list space-y-2">
-                  <li className="flex items-center text-white/60">
-                    <Check size={18} className="text-gold mr-2" />
-                    <span>Professional staff</span>
-                  </li>
-                  <li className="flex items-center text-white/60">
-                    <Check size={18} className="text-gold mr-2" />
-                    <span>Quality ingredients</span>
-                  </li>
-                  <li className="flex items-center text-white/60">
-                    <Check size={18} className="text-gold mr-2" />
-                    <span>Custom menus</span>
-                  </li>
+                  {service.features.map((feature) => (
+                    <li key={feature} className="flex items-center text-white/60">
+                      <Check size={18} className="text-gold mr-2" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
                 </ul>
               </motion.div>
             );

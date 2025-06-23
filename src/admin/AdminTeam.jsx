@@ -8,15 +8,12 @@
 // ===============================
 
 import React, { useState, useEffect, useRef } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../lib/supabaseClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AdminLogin from './Admin_Login';
 import { validateImageSize } from '../lib/validateImageSize';
 
-const supabaseUrl = 'https://sivcpdjtgysnryvfbcvw.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpdmNwZGp0Z3lzbnJ5dmZiY3Z3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1MTEyOTQsImV4cCI6MjA2NDA4NzI5NH0.P30L2h9NnsnSccm5NXWeIEMldZ6Tb54uA4zxoaSES1s';
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
 const ADMIN_EMAIL = 'bartenderbrothers87@gmail.com'; 
 const BUCKET = 'team';
 
@@ -155,68 +152,72 @@ function AdminTeamForm({ adminUser }) {
 
       {/* Add Form */}
       {showAddForm && (
-        <div className="bg-[#23272f] rounded-xl p-6 border border-gray-700 mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-white">Add New Team Member</h3>
-            <button 
-              onClick={() => setShowAddForm(false)}
-              className="text-gray-400 hover:text-gray-200"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              placeholder="Name"
-              value={form.name}
-              onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-              required
-              className="bg-[#18181b] text-gray-100 placeholder-gray-500 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-blue-700"
-            />
-            <Input
-              placeholder="Role"
-              value={form.role}
-              onChange={e => setForm(f => ({ ...f, role: e.target.value }))}
-              className="bg-[#18181b] text-gray-100 placeholder-gray-500 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-blue-700"
-            />
-            <Input
-              placeholder="Experience (years)"
-              type="number"
-              min="1"
-              value={form.experience}
-              onChange={e => setForm(f => ({ ...f, experience: e.target.value }))}
-              className="bg-[#18181b] text-gray-100 placeholder-gray-500 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-blue-700"
-            />
-            <div className="space-y-2">
-              <input
-                type="file"
-                accept="image/webp"
-                ref={fileInputRef}
-                onChange={e => {
-                  setError("");
-                  const file = e.target.files[0];
-                  if (!file) return;
-                  if (!validateImageSize(file, 650)) {
-                    setError('Only .webp images under 650 KB are accepted.');
-                    return;
-                  }
-                  handleImageUpload(e);
-                }}
-                className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-800 file:text-blue-400 hover:file:bg-gray-700"
-              />
-              {error && <div className="text-xs text-red-400">{error}</div>}
-              <div className="text-xs text-gray-400">Only .webp images under 650 KB are accepted.</div>
+        <div className="flex justify-center mb-8">
+          <div className="bg-[#23272f] rounded-xl p-6 border border-gray-700 w-full max-w-lg mx-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-white">Add New Team Member</h3>
+              <button 
+                onClick={() => setShowAddForm(false)}
+                className="text-gray-400 hover:text-gray-200"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
-            {uploading && <div className="text-blue-400 text-sm">Uploading image...</div>}
-            {form.photo_url && (
-              <img src={form.photo_url} alt="Preview" className="w-20 h-20 object-cover rounded-full border border-gray-700" />
-            )}
-            <Button type="submit" disabled={loading || uploading} className="w-full bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 rounded">
-              {loading ? 'Adding...' : 'Add Team Member'}
-            </Button>
-          </form>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <Input
+                placeholder="Name"
+                value={form.name}
+                onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                required
+                className="bg-[#18181b] text-gray-100 placeholder-gray-500 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-blue-700"
+              />
+              <Input
+                placeholder="Role"
+                value={form.role}
+                onChange={e => setForm(f => ({ ...f, role: e.target.value }))}
+                className="bg-[#18181b] text-gray-100 placeholder-gray-500 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-blue-700"
+              />
+              <Input
+                placeholder="Experience (years)"
+                type="number"
+                min="1"
+                value={form.experience}
+                onChange={e => setForm(f => ({ ...f, experience: e.target.value }))}
+                className="bg-[#18181b] text-gray-100 placeholder-gray-500 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-blue-700"
+              />
+              <div className="space-y-2">
+                <input
+                  type="file"
+                  accept="image/webp"
+                  ref={fileInputRef}
+                  onChange={e => {
+                    setError("");
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    if (!validateImageSize(file, 650)) {
+                      setError('Only .webp images under 650 KB are accepted.');
+                      return;
+                    }
+                    handleImageUpload(e);
+                  }}
+                  className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-800 file:text-blue-400 hover:file:bg-gray-700"
+                />
+                {error && <div className="text-xs text-red-400">{error}</div>}
+                <div className="text-xs text-gray-400">Only .webp images under 650 KB are accepted.</div>
+              </div>
+              {uploading && <div className="text-blue-400 text-sm">Uploading image...</div>}
+              {form.photo_url && (
+                <img src={form.photo_url} alt="Preview" className="w-20 h-20 object-cover rounded-full border border-gray-700" />
+              )}
+              <div className="flex justify-center">
+                <Button type="submit" disabled={loading || uploading} className="w-full max-w-xs bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 rounded">
+                  {loading ? 'Adding...' : 'Add Team Member'}
+                </Button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 
@@ -320,14 +321,14 @@ function AdminTeamForm({ adminUser }) {
                       experience: member.experience
                     });
                   }}
-                  className="flex-1 px-3 py-1.5 rounded bg-blue-600/20 text-blue-400 text-sm hover:bg-blue-600/30 transition-colors"
+                  className="w-24 px-3 py-1.5 rounded bg-blue-600/20 text-blue-400 text-sm hover:bg-blue-600/30 transition-colors"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => handleDelete(member.id)}
                   disabled={deletingId === member.id}
-                  className="flex-1 px-3 py-1.5 rounded bg-red-600/20 text-red-400 text-sm hover:bg-red-600/30 transition-colors"
+                  className="w-24 px-3 py-1.5 rounded bg-red-600/20 text-red-400 text-sm hover:bg-red-600/30 transition-colors"
                 >
                   {deletingId === member.id ? 'Deleting...' : 'Delete'}
                 </button>
