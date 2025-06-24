@@ -5,6 +5,7 @@ import AdminLogin from '../admin/Admin_Login';
 import AdminGallery from '../admin/AdminGallery';
 import AdminBooking from '../admin/AdminBooking'; // Import the new component
 import { supabase } from '../lib/supabaseClient';
+import ResetPassword from '../admin/ResetPassword';
 
 function AdminPanel() {
   const [adminUser, setAdminUser] = useState(null);
@@ -70,3 +71,9 @@ function AdminPanel() {
 }
 
 export default AdminPanel;
+
+// Add inside your existing route configuration
+{
+  path: '/reset-password';
+  element: <ResetPassword />
+}

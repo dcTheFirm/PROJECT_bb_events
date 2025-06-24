@@ -1,4 +1,4 @@
-// ===============================
+  // ===============================
 // AdminLogin.jsx
 // Admin panel login component with:
 // - Login/logout
@@ -40,8 +40,9 @@ function AdminLogin({ onLogin }) {
   async function handleResetPassword(e) {
     e.preventDefault();
     setAuthError('');
-    setResetSent(false);
+    setLoading(true); // Add loading state
     const { error } = await supabase.auth.resetPasswordForEmail(resetEmail || authEmail);
+    setLoading(false);
     if (error) {
       setAuthError(error.message);
     } else {
@@ -94,8 +95,14 @@ function AdminLogin({ onLogin }) {
             onChange={e => setResetEmail(e.target.value)}
             className="mb-2 bg-[#18181b] text-gray-100 placeholder-gray-500 border border-gray-700"
           />
-          <Button type="submit" variant="outline" className="w-full mb-2">
-            Send Recovery Email
+       
+          <Button 
+            type="submit" 
+            variant="outline" 
+            className="w-full mb-2"
+            disabled={loading} // Add disabled state
+          >
+            {loading ? 'Sending...' : 'Send Recovery Email'}
           </Button>
         </form>
       )}
