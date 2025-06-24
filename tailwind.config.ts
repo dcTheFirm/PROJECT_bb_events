@@ -1,13 +1,14 @@
 
+
 import type { Config } from "tailwindcss";
 
 export default {
   darkMode: ["class"],
   content: [
-    "./pages/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-    "./app/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx}",
+    "./pages/**/*.{ts,tsx,js,jsx}",
+    "./components/**/*.{ts,tsx,js,jsx}",
+    "./app/**/*.{ts,tsx,js,jsx}",
+    "./src/**/*.{ts,tsx,js,jsx}",
   ],
   prefix: "",
   theme: {
@@ -57,6 +58,16 @@ export default {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))'
         },
+        // Add root-level colors that were in the JS file
+        gold: '#FFD700',
+        amber: '#FFA500',
+        purple: '#9b59b6',
+        'deep-purple': '#8e44ad',
+        burgundy: '#800020',
+        whiskey: '#D4AC0D',
+        ice: '#A5F2F3',
+        dark: '#0D0D14',
+        // Keep the cocktail namespace too
         sidebar: {
           DEFAULT: 'hsl(var(--sidebar-background))',
           foreground: 'hsl(var(--sidebar-foreground))',
