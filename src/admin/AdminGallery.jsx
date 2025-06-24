@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { validateImageSize } from '../lib/validateImageSize';
 
-function AdminGallery() {
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import AdminLogin from './Admin_Login';
+
+function AdminGallery({ adminUser }) {
   const [nav, setNav] = useState('showcases');
   const [sectionCount, setSectionCount] = useState(1);
   const [sectionInputs, setSectionInputs] = useState([{ title: '', position: 1 }]);
@@ -40,16 +44,16 @@ function AdminGallery() {
 
   // Fetch sections for selected nav
   useEffect(() => {
-    fetchSections();
+    if (adminUser) fetchSections();
     setSelectedSection(null);
     setSectionInputs([{ title: '', position: 1 }]); // Always initialize with one empty section
-  }, [nav]);
+  }, [nav, adminUser]);
 
   // Fetch images for selected section
   useEffect(() => {
-    if (selectedSection && selectedSection.id) fetchImages(selectedSection.id);
+    if (selectedSection && selectedSection.id && adminUser) fetchImages(selectedSection.id);
     else setImages([]);
-  }, [selectedSection]);
+  }, [selectedSection, adminUser]);
 
   // Update localPositions when images change
   useEffect(() => {
@@ -62,40 +66,45 @@ function AdminGallery() {
     }
   }, [images]);
 
-  // Fetch categories from Supabase
+  // Fetch categories from Supabase on initial load if admin is logged in
   useEffect(() => {
-    fetchCategories();
-  }, []);
+    if (adminUser) {
+        fetchCategories();
+    }
+    // eslint-disable-next-line
+  }, [adminUser]);
 
   async function fetchSections() {
     setLoading(true);
-    let { data } = await supabase
+    let { data, error } = await supabase
       .from('gallery_sections')
       .select('*')
       .eq('category', nav)
       .order('position', { ascending: true });
+    console.log('Fetched sections for category', nav, data, error);
     setSections(data || []);
     setLoading(false);
   }
 
   async function fetchImages(sectionId) {
     setImgLoading(true);
-    let { data } = await supabase
+    let { data, error } = await supabase
       .from('gallery_images')
       .select('*')
       .eq('section_id', sectionId)
       .order('position', { ascending: true });
-    console.log('Fetched images for section', sectionId, data);
+    console.log('Fetched images for section', sectionId, data, error);
     setImages(data || []);
     setImgLoading(false);
   }
 
   // Fetch categories from Supabase
   async function fetchCategories() {
-    let { data } = await supabase
+    let { data, error } = await supabase
       .from('gallery_categories')
       .select('*')
       .order('position', { ascending: true });
+    console.log('Fetched categories', data, error);
     setCategories(data || []);
     // Set nav to first category if not set
     if (data && data.length > 0 && !categories.find(c => c.key === nav)) {
@@ -112,6 +121,7 @@ function AdminGallery() {
     setSectionInputs(inputs => inputs.map((s, i) => i === idx ? { ...s, [field]: value } : s));
   }
   async function handleAddSections() {
+    if (!adminUser) return;
     setLoading(true);
     // Only insert sections with non-empty titles
     const toInsert = sectionInputs.filter(s => s.title && s.title.trim() !== '').map(s => ({ ...s, category: nav }));
@@ -132,6 +142,7 @@ function AdminGallery() {
     setLoading(false);
   }
   async function handleDeleteSection(id) {
+    if (!adminUser) return;
     setLoading(true);
     await supabase.from('gallery_sections').delete().eq('id', id);
     await fetchSections();
@@ -139,13 +150,14 @@ function AdminGallery() {
     setLoading(false);
   }
   async function handleUpdateSectionPosition(id, position) {
+    if (!adminUser) return;
     setLoading(true);
     await supabase.from('gallery_sections').update({ position }).eq('id', id);
     await fetchSections();
     setLoading(false);
   }
   async function handleUpdateSectionTitle(id, newTitle) {
-    if (!newTitle || newTitle.trim() === "") return;
+    if (!newTitle || newTitle.trim() === "" || !adminUser) return;
     setLoading(true);
     try {
       const { error } = await supabase
@@ -180,7 +192,7 @@ function AdminGallery() {
   }
   // Image CRUD
   async function handleAddImage() {
-    if (!newImage.file || !selectedSection) return;
+    if (!newImage.file || !selectedSection || !adminUser) return;
     setImgLoading(true);
     const file = newImage.file;
     const fileName = `${Date.now()}_${file.name}`;
@@ -204,12 +216,14 @@ function AdminGallery() {
     setImgLoading(false);
   }
   async function handleDeleteImage(id) {
+    if (!adminUser) return;
     setImgLoading(true);
     await supabase.from('gallery_images').delete().eq('id', id);
     await fetchImages(selectedSection.id);
     setImgLoading(false);
   }
   async function handleUpdateImagePosition(id, position) {
+    if (!adminUser) return;
     setImgLoading(true);
     await supabase.from('gallery_images').update({ position }).eq('id', id);
     await fetchImages(selectedSection.id);
@@ -218,16 +232,37 @@ function AdminGallery() {
 
   // Add category
   async function handleAddCategory() {
-    if (!newCategory.label.trim()) return;
-    const { error } = await supabase.from('gallery_categories').insert([newCategory]);
-    if (!error) {
+    if (!newCategory.label.trim() || !adminUser) return;
+    
+    try {
+      // Generate a URL-friendly key from the label
+      const key = newCategory.label.toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+
+      const { error } = await supabase.from('gallery_categories').insert([{
+        ...newCategory,
+        key: key,
+        position: parseInt(newCategory.position) || 1
+      }]);
+
+      if (error) {
+        console.error('Error adding category:', error);
+        alert('Failed to add category: ' + error.message);
+        return;
+      }
+
       setNewCategory({ position: 1, label: '' });
       await fetchCategories();
+    } catch (err) {
+      console.error('Error adding category:', err);
+      alert('Failed to add category: ' + err.message);
     }
   }
   // Edit category
   async function handleEditCategory() {
-    if (!editedCategory.label.trim() || !editingCategory) return;
+    if (!editedCategory.label.trim() || !editingCategory || !adminUser) return;
     const { error } = await supabase.from('gallery_categories').update(editedCategory).eq('id', editingCategory.id);
     if (!error) {
       setEditingCategory(null);
@@ -237,13 +272,14 @@ function AdminGallery() {
   }
   // Delete category
   async function handleDeleteCategory(id) {
+    if (!adminUser) return;
     await supabase.from('gallery_categories').delete().eq('id', id);
     await fetchCategories();
   }
 
   // Add function to handle image edit
   async function handleUpdateImage(id) {
-    if (!editedImagePosition) return;
+    if (!editedImagePosition || !adminUser) return;
     setImgLoading(true);
     await supabase.from('gallery_images').update({ position: editedImagePosition }).eq('id', id);
     setEditingImage(null);
@@ -263,11 +299,12 @@ function AdminGallery() {
               <button
                 onClick={() => { setNav(cat.key); setActiveTab('sections'); }}
                 className={`w-full px-6 py-3 rounded-lg text-lg font-semibold transition-all duration-300 text-left ${nav === cat.key ? 'bg-white text-black' : 'bg-white/10 text-white hover:bg-white/20'}`}
+                disabled={!adminUser}
               >
                 {cat.label}
               </button>
-              <button className="text-xs text-blue-400" onClick={() => { setEditingCategory(cat); setEditedCategory({ position: cat.position, label: cat.label }); }}>Edit</button>
-              <button className="text-xs text-red-400" onClick={() => handleDeleteCategory(cat.id)}>Delete</button>
+              <button className="text-xs text-blue-400" onClick={() => { setEditingCategory(cat); setEditedCategory({ position: cat.position, label: cat.label }); }} disabled={!adminUser}>Edit</button>
+              <button className="text-xs text-red-400" onClick={() => handleDeleteCategory(cat.id)} disabled={!adminUser}>Delete</button>
             </div>
           ))}
         </nav>
@@ -280,6 +317,7 @@ function AdminGallery() {
             placeholder="Category Position"
             value={newCategory.position}
             onChange={e => setNewCategory({ ...newCategory, position: parseInt(e.target.value) || 1 })}
+            disabled={!adminUser}
           />
           <input
             className="px-3 py-2 rounded bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none text-base"
@@ -287,10 +325,12 @@ function AdminGallery() {
             placeholder="Category Label"
             value={newCategory.label}
             onChange={e => setNewCategory({ ...newCategory, label: e.target.value })}
+            disabled={!adminUser}
           />
           <button
             className="bg-blue-700 hover:bg-blue-800 text-white py-2 rounded font-semibold text-base transition"
             onClick={handleAddCategory}
+            disabled={!adminUser}
           >
             Add Category
           </button>
@@ -327,13 +367,14 @@ function AdminGallery() {
           <button
             className={`px-6 py-2 rounded-t-lg font-semibold ${activeTab === 'sections' ? 'bg-white text-black' : 'bg-gray-700 text-white'}`}
             onClick={() => setActiveTab('sections')}
+            disabled={!adminUser}
           >
             Sections
           </button>
           <button
             className={`px-6 py-2 rounded-t-lg font-semibold ${activeTab === 'images' ? 'bg-white text-black' : 'bg-gray-700 text-white'} ${!selectedSection ? 'opacity-50 cursor-not-allowed' : ''}`}
             onClick={() => selectedSection && setActiveTab('images')}
-            disabled={!selectedSection}
+            disabled={!selectedSection || !adminUser}
           >
             Images
           </button>
@@ -350,13 +391,14 @@ function AdminGallery() {
                     <button
                       className="text-lg font-bold text-blue-400 hover:underline text-left flex-1 truncate"
                       onClick={() => { setSelectedSection(section); setActiveTab('images'); }}
-                      style={{wordBreak: 'break-word'}}>
+                      style={{wordBreak: 'break-word'}}
+                      disabled={!adminUser}>
                       {section.title || section.name}
                     </button>
                     <button
                       className="text-xs text-red-400 hover:underline ml-4"
                       onClick={() => handleDeleteSection(section.id)}
-                      disabled={loading}
+                      disabled={loading || !adminUser}
                     >
                       Delete
                     </button>
@@ -369,6 +411,7 @@ function AdminGallery() {
                   <button
                     onClick={() => setShowSectionForm(true)}
                     className="w-full py-4 px-6 rounded-xl border-2 border-dashed border-gray-600 text-gray-400 hover:border-blue-500 hover:text-blue-500 transition-all duration-300 text-lg font-medium flex items-center justify-center gap-2"
+                    disabled={!adminUser}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -394,6 +437,7 @@ function AdminGallery() {
                       min={1}
                       value={sectionCount}
                       onChange={e => handleSectionCountChange(Number(e.target.value))}
+                      disabled={!adminUser}
                     />
                     {sectionInputs.length > 0 && (
                       <div className="space-y-4">
@@ -405,13 +449,14 @@ function AdminGallery() {
                               placeholder={`Section ${idx + 1} Title`}
                               value={s.title}
                               onChange={e => handleSectionInputChange(idx, 'title', e.target.value)}
+                              disabled={!adminUser}
                             />
                           </div>
                         ))}
                         <button
                           className="w-40 bg-blue-700 hover:bg-blue-800 text-white py-3 rounded font-semibold mt-2 text-lg transition"
                           onClick={handleAddSections}
-                          disabled={loading || sectionInputs.some(s => !s.title)}
+                          disabled={loading || sectionInputs.some(s => !s.title) || !adminUser}
                         >
                           {loading ? 'Adding...' : 'Add Sections'}
                         </button>
@@ -464,7 +509,7 @@ function AdminGallery() {
                               <button
                                 type="submit"
                                 className="p-1 text-green-400 hover:text-green-300 transition-colors"
-                                disabled={loading}
+                                disabled={loading || !adminUser}
                               >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -494,6 +539,7 @@ function AdminGallery() {
                                 setEditedTitle(selectedSection.title);
                               }}
                               title="Edit Title"
+                              disabled={!adminUser}
                             >
                               edit...
                             </button>
@@ -505,6 +551,7 @@ function AdminGallery() {
                       <button
                         onClick={() => setShowAddImageForm(true)}
                         className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition-colors flex items-center gap-2"
+                        disabled={!adminUser}
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -543,11 +590,12 @@ function AdminGallery() {
                             }
                             setNewImage({ ...newImage, file });
                           }}
+                          disabled={!adminUser}
                         />
                         <button
                           className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                           onClick={handleAddImage}
-                          disabled={imgLoading || !newImage.file}
+                          disabled={imgLoading || !newImage.file || !adminUser}
                         >
                           {imgLoading ? 'Uploading...' : 'Upload Image'}
                         </button>
@@ -592,7 +640,7 @@ function AdminGallery() {
                                   <button
                                     className="p-1 text-green-400 hover:text-green-300 transition-colors"
                                     onClick={() => handleUpdateImage(img.id)}
-                                    disabled={imgLoading}
+                                    disabled={imgLoading || !adminUser}
                                   >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -619,6 +667,7 @@ function AdminGallery() {
                                       setEditingImage(img.id);
                                       setEditedImagePosition(img.position);
                                     }}
+                                    disabled={!adminUser}
                                   >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -630,7 +679,7 @@ function AdminGallery() {
                             <button
                               className="px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg text-xs hover:bg-red-500/30 transition-colors flex items-center gap-1"
                               onClick={() => handleDeleteImage(img.id)}
-                              disabled={imgLoading}
+                              disabled={imgLoading || !adminUser}
                             >
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
