@@ -3,6 +3,7 @@ import AdminTeam from '../admin/AdminTeam';
 import AdminHome from '../admin/AdminHome';
 import AdminLogin from '../admin/Admin_Login';
 import AdminGallery from '../admin/AdminGallery';
+import AdminBooking from '../admin/AdminBooking'; // Import the new component
 import { supabase } from '../lib/supabaseClient';
 
 function AdminPanel() {
@@ -31,9 +32,9 @@ function AdminPanel() {
           </button>
         </div>
         <div className="mb-8 text-center text-gray-400 text-base">
-          Manage your team, home page images, and gallery here.
+          Manage your team, home page images, gallery, and bookings here.
         </div>
-        <div className="flex justify-center gap-4 mb-8">
+        <div className="flex justify-center gap-4 mb-8 flex-wrap">
           <button
             className={`px-6 py-2 rounded font-semibold transition-colors ${activeTab === 'team' ? 'bg-blue-700 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
             onClick={() => setActiveTab('team')}
@@ -52,10 +53,17 @@ function AdminPanel() {
           >
             Gallery
           </button>
+          <button
+            className={`px-6 py-2 rounded font-semibold transition-colors ${activeTab === 'bookings' ? 'bg-blue-700 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
+            onClick={() => setActiveTab('bookings')}
+          >
+            Bookings
+          </button>
         </div>
         {activeTab === 'team' && <AdminTeam adminUser={adminUser} />}
         {activeTab === 'images' && <AdminHome adminUser={adminUser} />}
         {activeTab === 'gallery' && <AdminGallery adminUser={adminUser} />}
+        {activeTab === 'bookings' && <AdminBooking adminUser={adminUser} />}
       </div>
     </div>
   );
