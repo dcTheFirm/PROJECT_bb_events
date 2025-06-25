@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import AdminLogin from './Admin_Login';
 
 export default function ResetPassword() {
   const [password, setPassword] = useState('');
