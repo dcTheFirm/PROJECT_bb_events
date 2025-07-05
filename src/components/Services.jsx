@@ -35,7 +35,7 @@ const services = [
     icon: Calendar,
     color: "from-burgundy to-purple",
     features: [
-      "Signature couple’s cocktails",
+      "Signature couple's cocktails",
   "Themed decor coordination",
   "Experienced wedding bartenders"
     ]
@@ -89,26 +89,43 @@ function Services() {
   }, []);
 
   return (
-    <section id="services" className="services py-24 bg-dark relative">
+    <motion.section
+      id="services"
+      className="services py-24 bg-dark relative"
+      initial={{ opacity: 0, y: 60 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: 'easeOut' }}
+      viewport={{ once: true }}
+    >
       <div className="container mx-auto px-4">
         <SectionHeading 
           title="Our Services" 
           subtitle="Exceptional mixology services tailored to your needs" 
         />
         
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <motion.div
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={{
+            hidden: {},
+            visible: {
+              transition: { staggerChildren: 0.13 },
+            },
+          }}
+        >
           {services.map((service, index) => {
-            // For the last two items, center them in a row
             if (services.length === 5 && index === 3) {
               return (
                 <div key="last-row" className="col-span-3 flex justify-center gap-8">
                   {[services[3], services[4]].map((srv, i) => (
                     <motion.div
                       key={srv.title}
-                      initial={{ opacity: 0, y: 30 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: (index + i) * 0.1 }}
-                      viewport={{ once: true }}
+                      variants={{
+                        hidden: { opacity: 0, y: 30 },
+                        visible: { opacity: 1, y: 0, transition: { duration: 0.6, type: 'spring' } },
+                      }}
                       className="serv-card glass-effect rounded-2xl p-8 group hover:shadow-glow transition-all duration-300 hover:-translate-y-2 w-full max-w-md"
                     >
                       <div className={`icon-box w-16 h-16 mb-6 rounded-full flex items-center justify-center bg-gradient-to-br ${srv.color}`}>
@@ -130,15 +147,13 @@ function Services() {
               );
             }
             if (index > 3) return null;
-            // For the first three items, render normally
-            
             return (
               <motion.div
                 key={service.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
+                variants={{
+                  hidden: { opacity: 0, y: 30 },
+                  visible: { opacity: 1, y: 0, transition: { duration: 0.6, type: 'spring' } },
+                }}
                 className="serv-card glass-effect rounded-2xl p-8 group hover:shadow-glow transition-all duration-300 hover:-translate-y-2"
               >
                 <div className={`icon-box w-16 h-16 mb-6 rounded-full flex items-center justify-center bg-gradient-to-br ${service.color}`}>
@@ -157,7 +172,7 @@ function Services() {
               </motion.div>
             );
           })}
-        </div>
+        </motion.div>
         
         {/* Feature callout */}
         <motion.div 
@@ -207,7 +222,7 @@ function Services() {
           </div>
         </motion.div>
       </div>
-    </section>
+    </motion.section>
   );
 }
 

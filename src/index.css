@@ -4,22 +4,22 @@
 
 @layer base {
   :root {
-    --background: 240 10% 3.9%;
+    --background: 240 10% 1.5%;
     --foreground: 0 0% 98%;
 
-    --card: 240 10% 3.9%;
+    --card: 240 10% 2%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 240 10% 3.9%;
+    --popover: 240 10% 2%;
     --popover-foreground: 0 0% 98%;
 
     --primary: 270 59% 53%;
     --primary-foreground: 0 0% 98%;
 
-    --secondary: 240 3.7% 15.9%;
+    --secondary: 240 3.7% 12%;
     --secondary-foreground: 0 0% 98%;
 
-    --muted: 240 3.7% 15.9%;
+    --muted: 240 3.7% 12%;
     --muted-foreground: 240 5% 64.9%;
 
     --accent: 39 100% 50%;
@@ -28,8 +28,8 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
+    --border: 240 3.7% 12%;
+    --input: 240 3.7% 12%;
     --ring: 39 100% 50%;
 
     --radius: 0.75rem;
@@ -62,7 +62,7 @@
   }
 
   .glass-effect {
-    @apply backdrop-blur-md bg-white/5 border border-white/10;
+    @apply backdrop-blur-md bg-black/20 border border-white/5;
   }
   
   .txt-gradient {
@@ -70,11 +70,11 @@
   }
   
   .shadow-glow {
-    @apply shadow-[0_0_15px_rgba(74,144,226,0.5)];
+    @apply shadow-[0_0_15px_rgba(74,144,226,0.3)];
   }
   
   .glass-card {
-    @apply backdrop-blur-md bg-white/5 border border-white/10 rounded-xl;
+    @apply backdrop-blur-md bg-black/20 border border-white/5 rounded-xl;
   }
   
   .nav-link {
@@ -93,7 +93,7 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.8);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -118,7 +118,7 @@ html {
   bottom: -100px;
   width: 40px;
   height: 40px;
-  background: rgba(255, 215, 0, 0.1);
+  background: rgba(255, 215, 0, 0.05);
   border-radius: 50%;
   opacity: 0;
   animation: bubble-rise 15s infinite ease-in;

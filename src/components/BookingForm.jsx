@@ -161,10 +161,10 @@ function BookingForm() {
             <h3 className="text-2xl font-playfair font-bold mb-6 text-[#4a90e2]/80">Request a Quote</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Input placeholder="Your Name" required className="bg-white/5 border-white/10 text-white placeholder:text-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2" />
+                <Input placeholder="Your Name" required className="bg-black/20 border-white/5 text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2" />
               </div>
               <div>
-                <Input type="email" placeholder="Your Email" required className="bg-white/5 border-white/10 text-white placeholder:text-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2" />
+                <Input type="email" placeholder="Your Email" required className="bg-black/20 border-white/5 text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2" />
               </div>
               <div>
                 <Input 
@@ -175,11 +175,11 @@ function BookingForm() {
                   maxLength={10}
                   minLength={10}
                   inputMode="numeric"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2" 
+                  className="bg-black/20 border-white/5 text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2" 
                 />
               </div>
               <div>
-                <select defaultValue="" required className="bg-white/5 border-white/10 text-white placeholder:text-black/40 w-full rounded-md p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2 appearance-none">
+                <select defaultValue="" required className="bg-black/20 border-white/5 text-white placeholder:text-white/30 w-full rounded-md p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2 appearance-none">
                   <option value="" disabled>Select Event Type</option>
                   <option value="Corporate Event">Corporate Event</option>
                   <option value="Wedding & Anniversary">Wedding & Anniversary</option>
@@ -219,7 +219,7 @@ function BookingForm() {
                         setDateWarning('');
                       }
                     }}
-                    className="bg-white/5 border-white/10 text-white placeholder:text-white/40 pl-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2"
+                    className="bg-black/20 border-white/5 text-white placeholder:text-white/30 pl-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2"
                   />
                 </div>
                 {dateWarning && <p className="text-red-500 text-sm mt-1">{dateWarning}</p>}
@@ -240,7 +240,7 @@ function BookingForm() {
                     }}
                     min={1}
                     max={2000}
-                    className="bg-white/5 border-white/10 text-white placeholder:text-white/40 pl-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2"
+                    className="bg-black/20 border-white/5 text-white placeholder:text-white/30 pl-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2"
                   />
                 </div>
               </div>
@@ -253,7 +253,7 @@ function BookingForm() {
                     required
                     value={location}
                     onChange={e => setLocation(e.target.value)}
-                    className={`bg-white/5 border-white/10 text-white placeholder:text-black/40 w-full rounded-md p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2 appearance-none ${locationWarning ? 'border-2 border-white border-solid focus-visible:ring-blue-500' : ''}`}
+                    className={`bg-black/20 border-white/5 text-white placeholder:text-white/30 w-full rounded-md p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2 appearance-none ${locationWarning ? 'border-2 border-white border-solid focus-visible:ring-blue-500' : ''}`}
                   />
                 </div>
                 {locationWarning && (
@@ -261,7 +261,7 @@ function BookingForm() {
                 )}
               </div>
               <div>
-                <textarea placeholder="Additional Details" rows={4} className="w-full rounded-md border border-white/10 bg-white/5 p-3 text-white placeholder:text-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2" />
+                <textarea placeholder="Additional Details" rows={4} className="w-full rounded-md border border-white/5 bg-black/20 p-3 text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2" />
               </div>
               <Button type="submit" className="bg-[#4a90e2]/80 hover:bg-[#4a90e2] w-full font-normal text-white">
                 Request a Quote

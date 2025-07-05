@@ -127,7 +127,7 @@ const Gallery = () => {
                 className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 ${
                   activeCategory === cat.key
                     ? 'bg-white text-black font-bold scale-105'
-                    : 'bg-white/10 text-white hover:bg-white/20'
+                    : 'bg-black/30 text-white hover:bg-black/50'
                 }`}
               >
                 {cat.label}
@@ -150,7 +150,7 @@ const Gallery = () => {
                   {(images[section.id] || []).map((img, idx) => (
                     <div
                       key={img.id}
-                      className="aspect-square overflow-hidden rounded-xl bg-gray-900 border border-white/10 shadow-lg cursor-pointer group relative hover:scale-105 transition-transform duration-300"
+                      className="aspect-square overflow-hidden rounded-xl bg-black/40 border border-white/5 shadow-lg cursor-pointer group relative hover:scale-105 transition-transform duration-300"
                       onClick={() => setSelectedImage(img)}
                       style={{ width: '100%', maxWidth: '300px', height: '250px' }}
                     >

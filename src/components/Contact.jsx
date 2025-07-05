@@ -93,7 +93,7 @@ function Contact() {
                 <Input 
                   placeholder="Your Name"
                   required
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                  className="bg-black/20 border-white/5 text-white placeholder:text-white/30"
                 />
               </div>
               <div>
@@ -101,14 +101,14 @@ function Contact() {
                   type="email"
                   placeholder="Your Email"
                   required
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                  className="bg-black/20 border-white/5 text-white placeholder:text-white/30"
                 />
               </div>
               <div>
                 <Input 
                   placeholder="Subject"
                   required
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                  className="bg-black/20 border-white/5 text-white placeholder:text-white/30"
                 />
               </div>
               <div>
@@ -116,7 +116,7 @@ function Contact() {
                   placeholder="Your Message"
                   rows={4}
                   required
-                  className="w-full rounded-md border border-white/10 bg-white/5 p-3 text-white placeholder:text-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  className="w-full rounded-md border border-white/5 bg-black/20 p-3 text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 />
               </div>
               <Button 

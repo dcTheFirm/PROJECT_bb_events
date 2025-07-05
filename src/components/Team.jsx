@@ -50,7 +50,7 @@ function Team() {
           ) : (
             <>
               <button
-                className="absolute left-[-56px] top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white rounded-full p-2 shadow-lg transition-colors"
+                className="absolute left-[-56px] top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-black/95 text-white rounded-full p-2 shadow-lg transition-colors"
                 onClick={handlePrev}
                 aria-label="Previous team members"
                 style={{ display: currentIndex > 0 ? 'block' : 'none' }}
@@ -93,7 +93,7 @@ function Team() {
                 ))}
               </div>
               <button
-                className="absolute right-[-56px] top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white rounded-full p-2 shadow-lg transition-colors"
+                className="absolute right-[-56px] top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-black/95 text-white rounded-full p-2 shadow-lg transition-colors"
                 onClick={handleNext}
                 aria-label="Next team members"
                 style={{ display: currentIndex + visibleCount < totalMembers ? 'block' : 'none' }}

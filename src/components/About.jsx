@@ -26,74 +26,82 @@ const About = () => {
     fetchImages();
   }, []);
 
-  return <section id="about" className="py-24 bg-black relative overflow-hidden">
+  return <motion.section 
+    id="about" 
+    className="py-24 bg-black relative overflow-hidden"
+    initial={{ opacity: 0, y: 60 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8, ease: 'easeOut' }}
+    viewport={{ once: true }}
+  >
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto text-center mb-16">
-          
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 font-['Playfair_Display'] text-[#b497bd]">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 font-['Playfair_Display'] text-transparent bg-clip-text bg-gradient-to-r from-gray-300 via-gray-500 to-gray-700">
             About Us
           </h2>
-          <p className="text-white/80 text-lg">Our story of passion for mixology and exceptional service</p>
+          <p className="text-gray-400 text-lg">Our story of passion for mixology and exceptional service</p>
         </div>
-        
         <div className="grid md:grid-cols-2 gap-12 items-center"> 
-          <div className="relative">
-
+          <motion.div 
+            className="relative"
+            initial={{ opacity: 0, x: -40 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
             <div className="aspect-[4/5] w-full rounded-2xl overflow-hidden glass-effect">
               {/* position 1 */}
               <img src={aboutImages[1] || ""} alt="Bartender crafting a cocktail" className="w-full h-full object-cover object-center" loading="lazy" />
             </div>
 
 
-            <div className="absolute -bottom-8 -right-8 w-48 h-48 md:w-64 md:h-64 rounded-2xl overflow-hidden rotate-12 glass-effect border border-white/20">
+            <div className="absolute -bottom-8 -right-8 w-48 h-48 md:w-64 md:h-64 rounded-2xl overflow-hidden rotate-12 glass-effect border border-white/10">
               {/* position 2 */}
               <img src={aboutImages[2] || ""} alt="Cocktail close-up" className="w-full h-full object-cover object-center" loading="lazy" />
             </div>
 
-            <div className="absolute -top-6 -left-6 w-32 h-32 md:w-48 md:h-48 rounded-full overflow-hidden border-4 border-cocktail-gold/20 glass-effect">
+            <div className="absolute -top-6 -left-6 w-32 h-32 md:w-48 md:h-48 rounded-full overflow-hidden border-4 border-cocktail-gold/10 glass-effect">
               {/* position 3 */}
               <img src={aboutImages[3] || ""} alt="" />
             </div>
-          </div>
+          </motion.div>
           
 
           
-          <div>
-            <h3 className="text-3xl md:text-4xl font-bold mb-4 font-['Playfair_Display'] text-[#b497bd]">
-              Crafting Memorable Experiences Since <span className="text-white">2019</span>
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            viewport={{ once: true }}
+          >
+            <h3 className="text-3xl md:text-4xl font-bold mb-4 font-['Playfair_Display'] text-transparent bg-clip-text bg-gradient-to-r from-gray-300 via-gray-500 to-gray-700">
+              Crafting Memorable Experiences Since <span className="text-gray-200">2019</span>
             </h3>
-            <p className="text-white/70 mb-6 leading-relaxed">
-              
-Bartender Brothers is a premium bartending service founded by two passionate and skilled brothers, Ajay Choudhary and Anil Kalal. With a combined experience of over 17 years in leading bars and luxury hospitality venues, the duo launched Bartender Brothers in 2019 to bring creativity, professionalism, and flair to event bartending.
-
-
+            <p className="text-gray-400 mb-6 leading-relaxed">
+              Bartender Brothers is a premium bartending service founded by two passionate and skilled brothers, Ajay Choudhary and Anil Kalal. With a combined experience of over 17 years in leading bars and luxury hospitality venues, the duo launched Bartender Brothers in 2019 to bring creativity, professionalism, and flair to event bartending.
             </p>
-            <p className="text-white/70 mb-6 leading-relaxed">
+            <p className="text-gray-400 mb-6 leading-relaxed">
             From intimate gatherings to grand weddings, Bartender Brothers has become known for curated cocktail experiences, thematic bar setups, signature drinks, and a team that ensures every guest has a memorable sip. The company blends world-class mixology with Indian hospitality, offering both alcoholic and non-alcoholic bar solutions tailored to the occasion.
-
             </p>
             <div className="grid grid-cols-2 gap-6 mt-10">
-              <div className="text-center">
-                <div className="text-4xl font-bold text-[#4a90e2]/80 mb-2">200+</div>
-                <div className="text-white/100 text-sm uppercase tracking-wider">Events Catered</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-[#4a90e2]/80 mb-2">25+</div>
-                <div className="text-white/100 text-sm uppercase tracking-wider">Signature Cocktails</div>
-              </div>
-              <div className="text-center">
-               <div className="text-4xl font-bold text-[#4a90e2]/80 mb-2">10+</div>
-                <div className="text-white/100 text-sm uppercase tracking-wider">Expert Mixologists</div>
-              </div>
-              <div className="text-center">
-               <div className="text-4xl font-bold text-[#4a90e2]/80 mb-2">98%</div>
-                <div className="text-white/100 text-sm uppercase tracking-wider">Client Satisfaction</div>
-              </div>
+              {[{label:'Events Catered',value:'200+'},{label:'Signature Cocktails',value:'25+'},{label:'Expert Mixologists',value:'10+'},{label:'Client Satisfaction',value:'98%'}].map((stat,i)=>(
+                <motion.div 
+                  key={stat.label} 
+                  className="text-center"
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, delay: 0.5 + i*0.1 }}
+                  viewport={{ once: true }}
+                >
+                  <div className="text-4xl font-bold text-gray-400 mb-2">{stat.value}</div>
+                  <div className="text-gray-500 text-sm uppercase tracking-wider">{stat.label}</div>
+                </motion.div>
+              ))}
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
-    </section>;
+    </motion.section>;
 };
 
 export default About;

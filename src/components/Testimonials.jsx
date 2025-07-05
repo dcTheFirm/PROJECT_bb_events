@@ -75,7 +75,7 @@ function Testimonials() {
           {/* Navigation arrows */}
           <button 
             onClick={prevSlide}
-            className="nav-btn absolute left-0 top-1/2 -translate-y-1/2 z-10 -ml-6 lg:-ml-12 p-3 rounded-full bg-black/50 text-white hover:bg-black/80 transition-colors"
+            className="nav-btn absolute left-0 top-1/2 -translate-y-1/2 z-10 -ml-6 lg:-ml-12 p-3 rounded-full bg-black/70 text-white hover:bg-black/90 transition-colors"
             aria-label="Previous testimonial"
           >
             <ChevronLeft size={24} />
@@ -83,7 +83,7 @@ function Testimonials() {
           
           <button 
             onClick={nextSlide}
-            className="nav-btn absolute right-0 top-1/2 -translate-y-1/2 z-10 -mr-6 lg:-mr-12 p-3 rounded-full bg-black/50 text-white hover:bg-black/80 transition-colors"
+            className="nav-btn absolute right-0 top-1/2 -translate-y-1/2 z-10 -mr-6 lg:-mr-12 p-3 rounded-full bg-black/70 text-white hover:bg-black/90 transition-colors"
             aria-label="Next testimonial"
           >
             <ChevronRight size={24} />

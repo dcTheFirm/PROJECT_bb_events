@@ -1,24 +1,23 @@
-
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
-
 import { cn } from "@/lib/utils"
+import { motion } from "framer-motion"
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-gradient-to-r from-[#4a90e2] to-[#4a90e2]/80 text-white hover:from-[#4a90e2]/90 hover:to-[#4a90e2]/70",
+        default: "bg-gradient-to-r from-gray-800 to-gray-900 text-gray-100 hover:from-gray-700 hover:to-gray-800",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+          "bg-red-800 text-gray-100 hover:bg-red-900",
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+          "border border-gray-700 bg-gray-900 text-gray-200 hover:bg-gray-800 hover:text-gray-100",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+          "bg-gray-700 text-gray-200 hover:bg-gray-600",
+        ghost: "hover:bg-gray-800 hover:text-gray-100",
+        link: "text-gray-300 underline-offset-4 hover:underline",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -42,12 +41,27 @@ export interface ButtonProps
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button"
+    if (asChild) {
+      return (
+        <Slot
+          className={cn(buttonVariants({ variant, size, className }))}
+          ref={ref as React.Ref<any>}
+          {...props}
+        />
+      )
+    }
+    const {
+      onDrag, onDragStart, onDragEnd, onDragOver, onDragEnter, onDragLeave, onDrop, draggable,
+      onAnimationStart, onAnimationEnd, onAnimationIteration,
+      ...rest
+    } = props as React.ButtonHTMLAttributes<HTMLButtonElement>;
     return (
-      <Comp
+      <motion.button
+        whileHover={{ scale: 1.06, boxShadow: '0 0 16px #4a90e2' }}
+        whileTap={{ scale: 0.98 }}
         className={cn(buttonVariants({ variant, size, className }))}
-        ref={ref}
-        {...props}
+        ref={ref as React.Ref<HTMLButtonElement>}
+        {...rest}
       />
     )
   }
