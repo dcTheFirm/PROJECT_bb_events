@@ -4,6 +4,7 @@ import AdminHome from '../admin/AdminHome';
 import AdminLogin from '../admin/Admin_Login';
 import AdminGallery from '../admin/AdminGallery';
 import AdminBooking from '../admin/AdminBooking'; // Import the new component
+import AdminHeroMedia from '../admin/AdminHeroMedia'; // Import the new Hero Media admin section
 import { supabase } from '../lib/supabaseClient';
 import ResetPassword from '../admin/ResetPassword';
 
@@ -49,6 +50,12 @@ function AdminPanel() {
             Home Images
           </button>
           <button
+            className={`px-6 py-2 rounded font-semibold transition-colors ${activeTab === 'hero' ? 'bg-blue-700 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
+            onClick={() => setActiveTab('hero')}
+          >
+            Hero Media
+          </button>
+          <button
             className={`px-6 py-2 rounded font-semibold transition-colors ${activeTab === 'gallery' ? 'bg-blue-700 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
             onClick={() => setActiveTab('gallery')}
           >
@@ -61,10 +68,13 @@ function AdminPanel() {
             Bookings
           </button>
         </div>
-        {activeTab === 'team' && <AdminTeam adminUser={adminUser} />}
-        {activeTab === 'images' && <AdminHome adminUser={adminUser} />}
-        {activeTab === 'gallery' && <AdminGallery adminUser={adminUser} />}
-        {activeTab === 'bookings' && <AdminBooking adminUser={adminUser} />}
+        <div className="mt-8">
+          {activeTab === 'team' && <AdminTeam adminUser={adminUser} />}
+          {activeTab === 'images' && <AdminHome adminUser={adminUser} />}
+          {activeTab === 'hero' && <AdminHeroMedia adminUser={adminUser} />}
+          {activeTab === 'gallery' && <AdminGallery adminUser={adminUser} />}
+          {activeTab === 'bookings' && <AdminBooking adminUser={adminUser} />}
+        </div>
       </div>
     </div>
   );

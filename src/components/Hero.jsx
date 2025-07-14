@@ -3,59 +3,52 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 
-// Sample media (images and videos from Unsplash/Pexels)
-const sampleMedia = [
-  {
-    id: 1,
-    media_type: 'image',
-    media_url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
-    title: 'Elegant Event Setup',
-    description: 'A beautifully decorated event space with ambient lighting and modern decor.',
-    category: 'Event',
-  },
-  {
-    id: 2,
-    media_type: 'video',
-    media_url: 'https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4',
-    title: 'Mixology in Action',
-    description: 'Watch our bartender craft signature cocktails with flair and precision.',
-    category: 'Bartending',
-  },
-  {
-    id: 3,
-    media_type: 'image',
-    media_url: 'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=800&q=80',
-    title: 'Gourmet Presentation',
-    description: 'Stunning food and drink presentation for a luxury event.',
-    category: 'Catering',
-  },
-  {
-    id: 4,
-    media_type: 'video',
-    media_url: 'https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4',
-    title: 'Event Highlights',
-    description: 'A quick look at the highlights from our recent events.',
-    category: 'Highlights',
-  },
-  {
-    id: 5,
-    media_type: 'image',
-    media_url: 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=800&q=80',
-    title: 'Live Music Vibes',
-    description: 'Live band performance energizing the crowd at a night event.',
-    category: 'Entertainment',
-  },
-  {
-    id: 6,
-    media_type: 'image',
-    media_url: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=800&q=80',
-    title: 'Chic Lounge Area',
-    description: 'Modern lounge area for guests to relax and socialize.',
-    category: 'Lounge',
-  },
-];
+import { supabase } from '../lib/supabaseClient'; // Add this import
+
+const BUCKET = 'hero-media'; // Bucket name for hero media
+
+
 
 function Hero() {
+  const [mediaList, setMediaList] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Only add these two new lines:
+  const heroRef = useRef(null);
+  const [isInView, setIsInView] = useState(true); // Track if hero is in viewport
+
+  // Fetch media from Supabase on mount
+  useEffect(() => {
+    async function fetchMedia() {
+      setLoading(true);
+      const { data, error } = await supabase.from('hero_media').select('*').order('id', { ascending: true });
+      if (!error && data) {
+        // Attach publicURL for each media with extra debug
+        const withUrls = data.map(m => {
+          const fileName = m.media_url;
+          const urlObj = supabase.storage.from(BUCKET).getPublicUrl(fileName);
+          if (!fileName) {
+            console.warn('Missing media_url for record:', m);
+          }
+          if (!urlObj.publicURL) {
+            console.warn('Could not generate public URL for:', fileName, urlObj);
+          }
+          return {
+            ...m,
+            public_url: urlObj.publicURL
+          };
+        });
+        console.log('Fetched media:', withUrls);
+        setMediaList(withUrls);
+      } else {
+        setMediaList([]);
+      }
+      setLoading(false);
+    }
+    fetchMedia();
+  }, []);
+
+  // Carousel state
   const [selectedMedia, setSelectedMedia] = useState(null);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [isAutoplay, setIsAutoplay] = useState(true);
@@ -63,8 +56,41 @@ function Hero() {
   const videoRef = useRef(null);
   const intervalRef = useRef(null);
 
-  const currentMedia = sampleMedia[currentIdx];
+  // Use mediaList instead of sampleMedia
+  const currentMedia = mediaList[currentIdx] || null;
   const isCurrentVideo = currentMedia?.media_type === 'video';
+  useEffect(() => {
+    const observer = new window.IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting);
+      },
+      { threshold: 0.15 }
+    );
+    if (heroRef.current) {
+      observer.observe(heroRef.current);
+    }
+    return () => {
+      if (heroRef.current) observer.unobserve(heroRef.current);
+    };
+  }, []);
+
+  // Pause/resume autoplay and video when hero is out of view
+  useEffect(() => {
+    if (!isInView) {
+      setIsAutoplay(false);
+      if (videoRef.current && !videoRef.current.paused) {
+        videoRef.current.pause();
+        setVideoPaused(true);
+      }
+    } else {
+      setIsAutoplay(true);
+      if (videoRef.current && videoPaused) {
+        videoRef.current.play();
+        setVideoPaused(false);
+      }
+    }
+    // eslint-disable-next-line
+  }, [isInView]);
 
   // Helper to stop and reset video
   const stopAndResetVideo = () => {
@@ -78,14 +104,14 @@ function Hero() {
   // Go to next slide
   const nextSlide = () => {
     stopAndResetVideo();
-    setCurrentIdx((prev) => (prev === sampleMedia.length - 1 ? 0 : prev + 1));
+    setCurrentIdx((prev) => (mediaList.length === 0 ? 0 : (prev === mediaList.length - 1 ? 0 : prev + 1)));
     setIsAutoplay(false);
   };
 
   // Go to previous slide
   const prevSlide = () => {
     stopAndResetVideo();
-    setCurrentIdx((prev) => (prev === 0 ? sampleMedia.length - 1 : prev - 1));
+    setCurrentIdx((prev) => (mediaList.length === 0 ? 0 : (prev === 0 ? mediaList.length - 1 : prev - 1)));
     setIsAutoplay(false);
   };
 
@@ -158,8 +184,26 @@ function Hero() {
     }
   };
 
+  // Loading state
+  if (loading) {
+    return (
+      <section className="py-24 bg-black flex items-center justify-center min-h-[400px]">
+        <div className="text-white text-xl">Loading hero media...</div>
+      </section>
+    );
+  }
+
+  // Empty state
+  if (!mediaList.length) {
+    return (
+      <section className="py-24 bg-black flex items-center justify-center min-h-[400px]">
+        <div className="text-white text-xl">No hero media uploaded yet.</div>
+      </section>
+    );
+  }
+
   return (
-    <section className="py-24 bg-black relative overflow-hidden">
+    <section ref={heroRef} className="py-24 bg-black relative overflow-hidden">
       <div className="container mx-auto px-4">
         {/* Hero header */}
         <div className="text-center mb-16">
@@ -198,19 +242,19 @@ function Hero() {
                 style={{ transform: `translateX(-${currentIdx * 100}%)` }}
               >
                 <div className="flex">
-                  {sampleMedia.map((media, index) => (
+                  {mediaList.map((media, index) => (
                     <div key={media.id} className="w-full flex-shrink-0">
                       <div className="relative aspect-video">
                         {media.media_type === 'video' ? (
                           <div className="relative w-full h-full">
                             <video
                               ref={index === currentIdx ? videoRef : null}
-                              src={media.media_url}
+                              src={media.public_url}
                               className="w-full h-full object-cover cursor-pointer"
                               autoPlay={index === currentIdx}
                               playsInline
                               preload="metadata"
-                              poster="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80"
+                              poster={media.poster_url || undefined}
                               onEnded={index === currentIdx ? handleVideoEnd : undefined}
                               onClick={index === currentIdx ? handleVideoClick : undefined}
                             />
@@ -223,7 +267,7 @@ function Hero() {
                           </div>
                         ) : (
                           <img
-                            src={media.media_url}
+                            src={media.public_url}
                             alt={media.title}
                             className="w-full h-full object-cover"
                           />
@@ -233,9 +277,11 @@ function Hero() {
                         <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
                           <h3 className="text-3xl font-bold text-white mb-3 drop-shadow-lg">{media.title}</h3>
                           <p className="text-white/90 text-lg mb-4 drop-shadow">{media.description}</p>
-                          <span className="inline-block bg-amber-400/90 text-black px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
-                            {media.category}
-                          </span>
+                          {media.category && (
+                            <span className="inline-block bg-amber-400/90 text-black px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
+                              {media.category}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -246,7 +292,7 @@ function Hero() {
 
             {/* Dots navigation */}
             <div className="flex justify-center mt-8 space-x-3">
-              {sampleMedia.map((_, index) => (
+              {mediaList.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => goToSlide(index)}
@@ -280,7 +326,7 @@ function Hero() {
               {selectedMedia?.media_type === 'video' ? (
                 <AspectRatio ratio={16/9}>
                   <video
-                    src={selectedMedia?.media_url}
+                    src={selectedMedia?.public_url}
                     className="w-full h-full object-cover rounded-2xl shadow-lg"
                     controls
                     autoPlay
@@ -289,7 +335,7 @@ function Hero() {
               ) : (
                 <AspectRatio ratio={16/9}>
                   <img
-                    src={selectedMedia?.media_url}
+                    src={selectedMedia?.public_url}
                     alt={selectedMedia?.title}
                     className="w-full h-full object-cover rounded-2xl shadow-lg"
                   />
