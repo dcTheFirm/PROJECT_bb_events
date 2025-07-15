@@ -68,9 +68,17 @@ function AdminHeroMedia({ adminUser }) {
         setUploading(false);
         return;
       }
-      // Insert into DB
+      // Get the public URL (like AdminGallery)
+      const { data: publicUrlData } = supabase.storage.from(BUCKET).getPublicUrl(fileName);
+      const publicUrl = publicUrlData?.publicUrl || publicUrlData?.publicURL || (typeof publicUrlData === 'string' ? publicUrlData : null);
+      if (!publicUrl) {
+        setError('Could not generate public URL for the uploaded file.');
+        setUploading(false);
+        return;
+      }
+      // Insert into DB with public URL
       const { error: dbError } = await supabase.from('hero_media').insert([
-        { media_type: mediaType, media_url: fileName, title, description: desc }
+        { media_type: mediaType, media_url: publicUrl, title, description: desc }
       ]);
       if (dbError) {
         setError(dbError.message || 'DB insert failed');
@@ -131,11 +139,13 @@ function AdminHeroMedia({ adminUser }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {mediaList.map(media => (
               <div key={media.id} className="bg-[#18181b] rounded-lg p-4 flex flex-col gap-2 relative">
-                {media.media_type === 'image' ? (
-                  <img src={supabase.storage.from(BUCKET).getPublicUrl(media.media_url).publicURL} alt={media.title} className="rounded w-full h-48 object-cover" />
-                ) : (
-                  <video src={supabase.storage.from(BUCKET).getPublicUrl(media.media_url).publicURL} controls className="rounded w-full h-48 object-cover" />
-                )}
+                {!media.media_url ? (
+  <div className="text-red-500">Media URL not available</div>
+) : media.media_type === 'image' ? (
+  <img src={media.media_url} alt={media.title} className="rounded w-full h-48 object-cover" />
+) : (
+  <video src={media.media_url} controls className="rounded w-full h-48 object-cover" />
+)}
                 <div className="text-gray-100 font-semibold">{media.title}</div>
                 <div className="text-gray-400 text-sm">{media.description}</div>
                 <Button variant="destructive" onClick={() => handleDelete(media.id, media.media_url)} className="absolute top-2 right-2">Delete</Button>

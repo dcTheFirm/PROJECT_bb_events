@@ -23,23 +23,7 @@ function Hero() {
       setLoading(true);
       const { data, error } = await supabase.from('hero_media').select('*').order('id', { ascending: true });
       if (!error && data) {
-        // Attach publicURL for each media with extra debug
-        const withUrls = data.map(m => {
-          const fileName = m.media_url;
-          const urlObj = supabase.storage.from(BUCKET).getPublicUrl(fileName);
-          if (!fileName) {
-            console.warn('Missing media_url for record:', m);
-          }
-          if (!urlObj.publicURL) {
-            console.warn('Could not generate public URL for:', fileName, urlObj);
-          }
-          return {
-            ...m,
-            public_url: urlObj.publicURL
-          };
-        });
-        console.log('Fetched media:', withUrls);
-        setMediaList(withUrls);
+        setMediaList(data);
       } else {
         setMediaList([]);
       }
@@ -245,11 +229,13 @@ function Hero() {
                   {mediaList.map((media, index) => (
                     <div key={media.id} className="w-full flex-shrink-0">
                       <div className="relative aspect-video">
-                        {media.media_type === 'video' ? (
+                        {!media.media_url ? (
+                          <div className="text-red-500">Media URL not available</div>
+                        ) : media.media_type === 'video' ? (
                           <div className="relative w-full h-full">
                             <video
                               ref={index === currentIdx ? videoRef : null}
-                              src={media.public_url}
+                              src={media.media_url}
                               className="w-full h-full object-cover cursor-pointer"
                               autoPlay={index === currentIdx}
                               playsInline
@@ -258,7 +244,6 @@ function Hero() {
                               onEnded={index === currentIdx ? handleVideoEnd : undefined}
                               onClick={index === currentIdx ? handleVideoClick : undefined}
                             />
-                            {/* Optional: show pause/play overlay */}
                             {index === currentIdx && (
                               <div className="absolute bottom-4 right-4 bg-black/60 rounded-full px-3 py-1 text-white text-xs select-none pointer-events-none">
                                 {videoPaused ? 'Paused' : 'Playing'}
@@ -267,7 +252,7 @@ function Hero() {
                           </div>
                         ) : (
                           <img
-                            src={media.public_url}
+                            src={media.media_url}
                             alt={media.title}
                             className="w-full h-full object-cover"
                           />
