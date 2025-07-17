@@ -36,7 +36,7 @@ function Team() {
   const visibleMembers = teamMembers.slice(currentIndex, currentIndex + visibleCount);
 
   return (
-    <section id="team" className="team py-24 bg-gradient-to-b from-black to-dark relative">
+    <section id="team" className="team py-24 bg-black relative">
       <div className="container mx-auto">
         <SectionHeading 
           title="Meet Our Team" 
@@ -50,7 +50,7 @@ function Team() {
           ) : (
             <>
               <button
-                className="absolute left-[-56px] top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-black/95 text-white rounded-full p-2 shadow-lg transition-colors"
+                className="absolute left-[-56px] top-1/2 -translate-y-1/2 z-10 bg-black/90 hover:bg-black text-white rounded-full p-2 shadow-lg transition-colors border border-gray-800"
                 onClick={handlePrev}
                 aria-label="Previous team members"
                 style={{ display: currentIndex > 0 ? 'block' : 'none' }}
@@ -67,25 +67,24 @@ function Team() {
                     viewport={{ once: true }}
                     className="team-card group relative"
                   >
-                    <div className="relative w-64 h-72 md:w-72 md:h-80 mx-auto overflow-hidden rounded-xl glass-effect">
+                    <div className="relative w-64 h-72 md:w-72 md:h-80 mx-auto overflow-hidden rounded-xl glass-effect border border-gray-800 shadow-xl">
                       <img 
                         src={member.photo_url || member.image || '/default-profile.png'} 
                         alt={member.name} 
                         className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
                         loading="lazy"
-                        style={{ filter: 'brightness(0.7)' }}
+                        style={{ filter: 'brightness(0.9)' }} 
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-70 group-hover:opacity-90 transition-opacity"></div>
                       <div className="absolute bottom-0 left-0 w-full p-4">
                         <h3 className="text-xl font-bold text-white mb-1 font-playfair">{member.name}</h3>
                         <p
-                          className="font-medium mb-2"
-                          style={{ color: 'rgb(212, 215, 109)' }}
+                          className="font-medium mb-2 text-[#b497bd]"
                         >
                           {member.role}
                         </p>
                         {member.experience !== undefined && member.experience !== null && member.experience !== '' && (
-                          <p className="text-sm text-white-300 mb-1">{member.experience} years of experience</p>
+                          <p className="text-sm text-gray-300 mb-1">{member.experience} years of experience</p>
                         )}
                       </div>
                     </div>
@@ -93,7 +92,7 @@ function Team() {
                 ))}
               </div>
               <button
-                className="absolute right-[-56px] top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-black/95 text-white rounded-full p-2 shadow-lg transition-colors"
+                className="absolute right-[-56px] top-1/2 -translate-y-1/2 z-10 bg-black/90 hover:bg-black text-white rounded-full p-2 shadow-lg transition-colors border border-gray-800"
                 onClick={handleNext}
                 aria-label="Next team members"
                 style={{ display: currentIndex + visibleCount < totalMembers ? 'block' : 'none' }}
@@ -104,7 +103,7 @@ function Team() {
           )}
         </div>
       </div>
-      <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-dark to-transparent"></div>
+      <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-black to-transparent"></div>
     </section>
   );
 }

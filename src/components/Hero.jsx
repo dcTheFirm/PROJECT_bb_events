@@ -187,213 +187,191 @@ function Hero() {
   }
 
   return (
-    <section id="home" ref={heroRef} className="py-24 bg-black relative overflow-hidden scroll-mt-24">
+    <section id="home" ref={heroRef} className="pt-24 pb-8 bg-black relative overflow-hidden scroll-mt-24">
       <div className="container mx-auto px-4">
         {/* Hero header */}
-        <div className="text-center mb-16">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4 font-['Playfair_Display'] text-[#b497bd]">
+        <div className="text-center mb-8">
+          <h1 className="text-[30px] md:text-[30px] font-bold font-['Playfair_Display'] text-[#b497bd] drop-shadow-lg">
             Our Works, Your Inspiration
           </h1>
         </div>
 
         {/* Media Carousel */}
-        <div className="max-w-6xl mx-auto flex items-center justify-center relative">
-          <div className="w-full flex items-center justify-between gap-4">
-  {/* Navigation arrows - outside the media */}
-  <button
-    onClick={prevSlide}
-    className="z-20 w-12 h-12 bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/90 transition-all hover:scale-110 shadow-lg"
-    aria-label="Previous media"
-    style={{ marginLeft: '-2.5rem' }}
-  >
-    <ChevronLeft size={24} />
-  </button>
+        <div className="w-full mx-auto relative">
+          <div className="w-full flex items-center justify-between gap-2">
+            {/* Navigation arrows - outside the media */}
+            <button
+              onClick={prevSlide}
+              className="z-20 w-10 h-10 bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/90 transition-all hover:scale-110 shadow-lg"
+              aria-label="Previous media"
+            >
+              <ChevronLeft size={20} />
+            </button>
 
-  {/* Main media display with fixed aspect ratio and max dimensions */}
-  <div className="relative overflow-hidden rounded-2xl glass-effect shadow-2xl flex-1 flex items-center justify-center bg-black aspect-video" style={{ minHeight: '350px' }}>
-    <div
-      className="transition-all duration-700 ease-out h-full w-full flex items-center justify-center"
-      style={{ transform: `translateX(-${currentIdx * 100}%)` }}
-    >
-      <div className="flex h-full w-full items-center justify-center">
-        {mediaList.map((media, index) => (
-          <div key={media.id} className="w-full flex-shrink-0 h-full flex items-center justify-center">
-            <div className={`relative w-full h-full flex items-center justify-center ${media.media_type === 'video' ? 'max-w-4xl w-[900px]' : 'max-w-2xl w-full'} mx-auto`}>
-              {!media.media_url ? (
-                <div className="text-red-500">Media URL not available</div>
-              ) : media.media_type === 'video' ? (
-                <video
-                  ref={index === currentIdx ? videoRef : null}
-                  src={media.media_url}
-                  className="w-full h-full object-contain rounded-2xl cursor-pointer"
-                  autoPlay={index === currentIdx}
-                  playsInline
-                  preload="metadata"
-                  poster={media.poster_url || undefined}
-                  onEnded={index === currentIdx ? handleVideoEnd : undefined}
-                  onClick={index === currentIdx ? handleVideoClick : undefined}
-                  muted
-                  loop
-                />
+            {/* Main media display with fixed aspect ratio and max dimensions */}
+            <div className="relative overflow-hidden rounded-xl glass-effect shadow-2xl flex-1 flex items-center justify-center bg-black/40 backdrop-blur-sm" style={{ height: "450px" }}>
+              {mediaList.map((media, index) => (
+                <div 
+                  key={media.id} 
+                  className={`absolute top-0 left-0 w-full h-full transition-opacity duration-700 ease-out flex items-center justify-center ${
+                    index === currentIdx ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                  }`}
+                >
+                  <div className={`relative w-full h-full flex items-center justify-center mx-auto`}>
+                    {!media.media_url ? (
+                      <div className="text-red-500">Media URL not available</div>
+                    ) : media.media_type === 'video' ? (
+                      <video
+                        ref={index === currentIdx ? videoRef : null}
+                        src={media.media_url}
+                        className="w-full h-full object-cover cursor-pointer shadow-lg"
+                        autoPlay={index === currentIdx}
+                        playsInline
+                        preload="metadata"
+                        poster={media.poster_url || undefined}
+                        onEnded={index === currentIdx ? handleVideoEnd : undefined}
+                        onClick={index === currentIdx ? handleVideoClick : undefined}
+                        // Remove the muted attribute from here
+                      />
+                    ) : (
+                      <img
+                        src={media.media_url}
+                        alt={media.title}
+                        className="w-full h-full object-cover shadow-lg"
+                        onClick={() => setSelectedMedia(media)}
+                      />
+                    )}
+
+                    {/* Overlay info */}
+                    {(media.title || media.description) && (
+                      <div className="absolute bottom-3 left-3 max-w-[60%] bg-black/75 backdrop-blur-sm rounded-lg px-3 py-2 flex flex-col items-start gap-0.5 shadow-xl">
+                        {media.title && <h3 className="text-base font-bold text-white leading-tight">{media.title}</h3>}
+                        {media.description && <p className="text-white/80 text-xs leading-snug line-clamp-1">{media.description}</p>}
+                        {media.category && (
+                          <span className="inline-block bg-amber-400/90 text-black px-2 py-0.5 rounded-full text-xs font-semibold shadow-md mt-0.5">
+                            {media.category}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button
+              onClick={nextSlide}
+              className="z-20 w-10 h-10 bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/90 transition-all hover:scale-110 shadow-lg"
+              aria-label="Next media"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
+
+          {/* Dots navigation */}
+          <div className="flex justify-center mt-4 space-x-2">
+            {mediaList.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => goToSlide(index)}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  index === currentIdx 
+                    ? 'bg-amber-400 scale-125 shadow-lg' 
+                    : 'bg-white/30 hover:bg-white/50 hover:scale-110'
+                }`}
+                aria-label={`Go to media ${index + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Media Modal */}
+      <Dialog open={!!selectedMedia} onOpenChange={() => setSelectedMedia(null)}>
+        <DialogContent className="max-w-5xl bg-black/95 border-gray-800 p-0 overflow-hidden rounded-xl">
+          <div className="relative">
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedMedia(null)}
+              className="absolute top-4 right-4 z-20 w-10 h-10 bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/80 transition-colors shadow-lg"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Media Content */}
+            <div className="relative p-4">
+              {!selectedMedia?.media_url ? (
+                <div className="text-red-500 p-8">Media URL not available</div>
+              ) : selectedMedia?.media_type === 'video' ? (
+                <div className="flex items-center justify-center w-full">
+                  <div className="relative w-full aspect-video flex items-center justify-center">
+                    <video
+                      src={selectedMedia.media_url}
+                      className="w-full h-full object-contain rounded-lg shadow-lg"
+                      controls
+                      autoPlay
+                      muted
+                      playsInline
+                      poster={selectedMedia.poster_url || undefined}
+                      onEnded={() => setSelectedMedia(null)}
+                    />
+                    {(selectedMedia.title || selectedMedia.description) && (
+                      <div className="absolute bottom-6 left-6 max-w-[70%] bg-black/80 rounded-lg px-5 py-4 flex flex-col items-start gap-2 shadow-xl">
+                        {selectedMedia.title && (
+                          <h3 className="text-xl md:text-2xl font-bold text-white mb-1 leading-tight">
+                            {selectedMedia.title}
+                          </h3>
+                        )}
+                        {selectedMedia.description && (
+                          <p className="text-white/90 text-sm md:text-base leading-snug">
+                            {selectedMedia.description}
+                          </p>
+                        )}
+                        {selectedMedia.category && (
+                          <span className="inline-block bg-amber-400/90 text-black px-3 py-1 rounded-full text-xs font-semibold shadow-md mt-1">
+                            {selectedMedia.category}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
               ) : (
-                <img
-                  src={media.media_url}
-                  alt={media.title}
-                  className="w-full h-full object-contain rounded-2xl"
-                />
-              )}
-
-              {/* Overlay info */}
-              {(media.title || media.description) && (
-                <div className="absolute bottom-6 left-6 max-w-[70%] bg-black/70 rounded-xl px-6 py-4 flex flex-col items-start gap-2 shadow-xl">
-                  {media.title && <h3 className="text-2xl md:text-3xl font-bold text-white mb-1 drop-shadow-lg leading-tight">{media.title}</h3>}
-                  {media.description && <p className="text-white/90 text-base md:text-lg mb-0 drop-shadow leading-snug">{media.description}</p>}
-                  {media.category && (
-                    <span className="inline-block bg-amber-400/90 text-black px-4 py-2 rounded-full text-xs md:text-sm font-semibold shadow-lg mt-1">
-                      {media.category}
-                    </span>
-                  )}
+                <div className="flex items-center justify-center w-full">
+                  <div className="relative w-full max-height-[80vh] flex items-center justify-center">
+                    <img
+                      src={selectedMedia.media_url}
+                      alt={selectedMedia.title}
+                      className="w-full max-h-[70vh] object-contain rounded-lg shadow-lg"
+                    />
+                    {(selectedMedia.title || selectedMedia.description) && (
+                      <div className="absolute bottom-6 left-6 max-w-[70%] bg-black/80 rounded-lg px-5 py-4 flex flex-col items-start gap-2 shadow-xl">
+                        {selectedMedia.title && (
+                          <h3 className="text-xl md:text-2xl font-bold text-white mb-1 leading-tight">
+                            {selectedMedia.title}
+                          </h3>
+                        )}
+                        {selectedMedia.description && (
+                          <p className="text-white/90 text-sm md:text-base leading-snug">
+                            {selectedMedia.description}
+                          </p>
+                        )}
+                        {selectedMedia.category && (
+                          <span className="inline-block bg-amber-400/90 text-black px-3 py-1 rounded-full text-xs font-semibold shadow-md mt-1">
+                            {selectedMedia.category}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
           </div>
-        ))}
-      </div>
-    </div>
-  </div>
-
-  <button
-    onClick={nextSlide}
-    className="z-20 w-12 h-12 bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/90 transition-all hover:scale-110 shadow-lg"
-    aria-label="Next media"
-    style={{ marginRight: '-2.5rem' }}
-  >
-    <ChevronRight size={24} />
-  </button>
-</div>
-
-{/* Dots navigation */}
-<div className="flex justify-center mt-8 space-x-3">
-  {mediaList.map((_, index) => (
-    <button
-      key={index}
-      onClick={() => goToSlide(index)}
-      className={`w-4 h-4 rounded-full transition-all duration-300 ${
-        index === currentIdx 
-          ? 'bg-amber-400 scale-125 shadow-lg' 
-          : 'bg-white/30 hover:bg-white/50 hover:scale-110'
-      }`}
-      aria-label={`Go to media ${index + 1}`}
-    />
-  ))}
-</div>
-        </div>
-
-        {/* Dots navigation */}
-        <div className="flex justify-center mt-8 space-x-3">
-          {mediaList.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => goToSlide(index)}
-              className={`w-4 h-4 rounded-full transition-all duration-300 ${
-                index === currentIdx 
-                  ? 'bg-amber-400 scale-125 shadow-lg' 
-                  : 'bg-white/30 hover:bg-white/50 hover:scale-110'
-              }`}
-              aria-label={`Go to media ${index + 1}`}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
-
-    {/* Media Modal */}
-    <Dialog open={!!selectedMedia} onOpenChange={() => setSelectedMedia(null)}>
-      <DialogContent className="max-w-4xl bg-black/95 border-gray-800 p-0 overflow-hidden">
-        <div className="relative">
-          {/* Close Button */}
-          <button
-            onClick={() => setSelectedMedia(null)}
-            className="absolute top-4 right-4 z-20 w-10 h-10 bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/80 transition-colors shadow-lg"
-          >
-            <X className="w-5 h-5" />
-          </button>
-
-          {/* Media Content */}
-          <div className="relative">
-            {!selectedMedia?.media_url ? (
-              <div className="text-red-500 p-8">Media URL not available</div>
-            ) : selectedMedia?.media_type === 'video' ? (
-              <div className="flex items-end justify-center w-full">
-                <div className="relative w-full max-w-4xl w-[900px] aspect-video flex items-end justify-center">
-                  <video
-                    src={selectedMedia.media_url}
-                    className="w-full h-full object-contain rounded-2xl shadow-lg"
-                    controls
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    poster={selectedMedia.poster_url || undefined}
-                  />
-                  {(selectedMedia.title || selectedMedia.description) && (
-                    <div className="absolute bottom-6 left-6 max-w-[70%] bg-black/70 rounded-xl px-6 py-4 flex flex-col items-start gap-2 shadow-xl">
-                      {selectedMedia.title && (
-                        <h3 className="text-2xl md:text-3xl font-bold text-white mb-1 drop-shadow-lg leading-tight">
-                          {selectedMedia.title}
-                        </h3>
-                      )}
-                      {selectedMedia.description && (
-                        <p className="text-white/90 text-base md:text-lg mb-0 drop-shadow leading-snug">
-                          {selectedMedia.description}
-                        </p>
-                      )}
-                      {selectedMedia.category && (
-                        <span className="inline-block bg-amber-400/90 text-black px-4 py-2 rounded-full text-xs md:text-sm font-semibold shadow-lg mt-1">
-                          {selectedMedia.category}
-                        </span>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-end justify-center w-full">
-                <div className="relative w-full max-w-2xl aspect-video flex items-end justify-center">
-                  <img
-                    src={selectedMedia.media_url}
-                    alt={selectedMedia.title}
-                    className="w-full h-full object-contain rounded-2xl shadow-lg"
-                  />
-                  {(selectedMedia.title || selectedMedia.description) && (
-                    <div className="absolute bottom-6 left-6 max-w-[70%] bg-black/70 rounded-xl px-6 py-4 flex flex-col items-start gap-2 shadow-xl">
-                      {selectedMedia.title && (
-                        <h3 className="text-2xl md:text-3xl font-bold text-white mb-1 drop-shadow-lg leading-tight">
-                          {selectedMedia.title}
-                        </h3>
-                      )}
-                      {selectedMedia.description && (
-                        <p className="text-white/90 text-base md:text-lg mb-0 drop-shadow leading-snug">
-                          {selectedMedia.description}
-                        </p>
-                      )}
-                      {selectedMedia.category && (
-                        <span className="inline-block bg-amber-400/90 text-black px-4 py-2 rounded-full text-xs md:text-sm font-semibold shadow-lg mt-1">
-                          {selectedMedia.category}
-                        </span>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-
-  </section>
-);
+        </DialogContent>
+      </Dialog>
+    </section>
+  );
 }
 
 export default Hero;
