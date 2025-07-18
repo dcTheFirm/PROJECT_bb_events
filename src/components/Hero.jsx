@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Volume2, VolumeX } from 'lucide-react';
 
 import { supabase } from '../lib/supabaseClient'; // Add this import
 
@@ -12,11 +12,12 @@ const BUCKET = 'hero-media'; // Bucket name for hero media
 function Hero() {
   const [mediaList, setMediaList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isMuted, setIsMuted] = useState(true); // Add this line to track mute status
 
   // Only add these two new lines:
   const heroRef = useRef(null);
   const [isInView, setIsInView] = useState(true); // Track if hero is in viewport
-
+  
   // Fetch media from Supabase on mount
   useEffect(() => {
     async function fetchMedia() {
@@ -43,6 +44,8 @@ function Hero() {
   // Use mediaList instead of sampleMedia
   const currentMedia = mediaList[currentIdx] || null;
   const isCurrentVideo = currentMedia?.media_type === 'video';
+  
+  // Setup intersection observer to detect when hero is in viewport
   useEffect(() => {
     const observer = new window.IntersectionObserver(
       ([entry]) => {
@@ -57,24 +60,6 @@ function Hero() {
       if (heroRef.current) observer.unobserve(heroRef.current);
     };
   }, []);
-
-  // Pause/resume autoplay and video when hero is out of view
-  useEffect(() => {
-    if (!isInView) {
-      setIsAutoplay(false);
-      if (videoRef.current && !videoRef.current.paused) {
-        videoRef.current.pause();
-        setVideoPaused(true);
-      }
-    } else {
-      setIsAutoplay(true);
-      if (videoRef.current && videoPaused) {
-        videoRef.current.play();
-        setVideoPaused(false);
-      }
-    }
-    // eslint-disable-next-line
-  }, [isInView]);
 
   // Helper to stop and reset video
   const stopAndResetVideo = () => {
@@ -111,6 +96,43 @@ function Hero() {
     nextSlide();
   };
 
+  // Click to pause/resume video and unmute
+  const handleVideoClick = () => {
+    if (videoRef.current) {
+      if (videoRef.current.paused) {
+        // When user clicks to play, don't automatically unmute
+        // Let the user control muting with the dedicated button
+        videoRef.current.play().catch(e => console.log('Video play failed on click:', e));
+        setVideoPaused(false);
+      } else {
+        videoRef.current.pause();
+        setVideoPaused(true);
+      }
+    }
+  };
+
+  // Pause/resume autoplay and video when hero is out of view
+  useEffect(() => {
+    if (!isInView) {
+      setIsAutoplay(false);
+      if (videoRef.current && !videoRef.current.paused) {
+        videoRef.current.pause();
+        setVideoPaused(true);
+      }
+    } else if (isInView && isCurrentVideo) {
+      // Only resume autoplay when coming back into view
+      setIsAutoplay(true);
+      // Only try to play if we previously paused due to scrolling away
+      if (videoRef.current && videoPaused) {
+        videoRef.current.play().catch(e => console.log('Video play failed on scroll back:', e));
+        setVideoPaused(false);
+      }
+    } else {
+      // For images, just resume autoplay
+      setIsAutoplay(true);
+    }
+  }, [isInView, isCurrentVideo, videoPaused]);
+
   // Image auto-advance logic (1.5 seconds)
   useEffect(() => {
     if (intervalRef.current) {
@@ -140,12 +162,12 @@ function Hero() {
     }
   }, [isAutoplay]);
 
-  // When switching to a video, always play from start (unmuted)
+  // When switching to a video, always play from start (muted for autoplay)
   useEffect(() => {
     if (isCurrentVideo && videoRef.current) {
       videoRef.current.currentTime = 0;
-      videoRef.current.muted = false;
-      videoRef.current.play();
+      videoRef.current.muted = true; // Set to muted to allow autoplay
+      videoRef.current.play().catch(e => console.log('Video play failed:', e));
       setVideoPaused(false);
     }
     // When leaving a video, stop it
@@ -154,19 +176,6 @@ function Hero() {
     };
     // eslint-disable-next-line
   }, [currentIdx]);
-
-  // Click to pause/resume video
-  const handleVideoClick = () => {
-    if (videoRef.current) {
-      if (videoRef.current.paused) {
-        videoRef.current.play();
-        setVideoPaused(false);
-      } else {
-        videoRef.current.pause();
-        setVideoPaused(true);
-      }
-    }
-  };
 
   // Loading state
   if (loading) {
@@ -186,105 +195,123 @@ function Hero() {
     );
   }
 
-  return (
-    <section id="home" ref={heroRef} className="pt-24 pb-8 bg-black relative overflow-hidden scroll-mt-24">
-      <div className="container mx-auto px-4">
-        {/* Hero header */}
-        <div className="text-center mb-8">
-          <h1 className="text-[30px] md:text-[30px] font-bold font-['Playfair_Display'] text-[#b497bd] drop-shadow-lg">
-            Our Works, Your Inspiration
-          </h1>
-        </div>
+    return (
+      <section id="home" ref={heroRef} className="pt-24 pb-8 bg-black relative overflow-hidden scroll-mt-24">
+        <div className="container mx-auto px-4">
+          {/* Hero header */}
+          <div className="text-center mb-8">
+            <h1 className="text-[30px] md:text-[30px] font-bold font-['Playfair_Display'] text-[#b497bd] drop-shadow-lg">
+              Our Works, Your Inspiration
+            </h1>
+          </div>
 
-        {/* Media Carousel */}
-        <div className="w-full mx-auto relative">
-          <div className="w-full flex items-center justify-between gap-2">
-            {/* Navigation arrows - outside the media */}
-            <button
-              onClick={prevSlide}
-              className="z-20 w-10 h-10 bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/90 transition-all hover:scale-110 shadow-lg"
-              aria-label="Previous media"
-            >
-              <ChevronLeft size={20} />
-            </button>
+          {/* Media Carousel */}
+          <div className="w-full mx-auto relative">
+            <div className="w-full flex items-center justify-between gap-2">
+              {/* Navigation arrows - outside the media */}
+              <button
+                onClick={prevSlide}
+                className="z-20 w-10 h-10 bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/90 transition-all hover:scale-110 shadow-lg"
+                aria-label="Previous media"
+              >
+                <ChevronLeft size={20} />
+              </button>
 
-            {/* Main media display with fixed aspect ratio and max dimensions */}
-            <div className="relative overflow-hidden rounded-xl glass-effect shadow-2xl flex-1 flex items-center justify-center bg-black/40 backdrop-blur-sm" style={{ height: "450px" }}>
-              {mediaList.map((media, index) => (
-                <div 
-                  key={media.id} 
-                  className={`absolute top-0 left-0 w-full h-full transition-opacity duration-700 ease-out flex items-center justify-center ${
-                    index === currentIdx ? 'opacity-100 z-10' : 'opacity-0 z-0'
-                  }`}
-                >
-                  <div className={`relative w-full h-full flex items-center justify-center mx-auto`}>
-                    {!media.media_url ? (
-                      <div className="text-red-500">Media URL not available</div>
-                    ) : media.media_type === 'video' ? (
-                      <video
-                        ref={index === currentIdx ? videoRef : null}
-                        src={media.media_url}
-                        className="w-full h-full object-cover cursor-pointer shadow-lg"
-                        autoPlay={index === currentIdx}
-                        playsInline
-                        preload="metadata"
-                        poster={media.poster_url || undefined}
-                        onEnded={index === currentIdx ? handleVideoEnd : undefined}
-                        onClick={index === currentIdx ? handleVideoClick : undefined}
-                        // Remove the muted attribute from here
-                      />
-                    ) : (
-                      <img
-                        src={media.media_url}
-                        alt={media.title}
-                        className="w-full h-full object-cover shadow-lg"
-                        onClick={() => setSelectedMedia(media)}
-                      />
-                    )}
+              {/* Main media display with fixed aspect ratio and max dimensions */}
+              <div className="relative overflow-hidden rounded-xl glass-effect shadow-2xl flex-1 flex items-center justify-center bg-black/40 backdrop-blur-sm" style={{ height: "450px" }}>
+                {mediaList.map((media, index) => (
+                  <div 
+                    key={media.id} 
+                    className={`absolute top-0 left-0 w-full h-full transition-opacity duration-700 ease-out flex items-center justify-center ${
+                      index === currentIdx ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                    }`}
+                  >
+                    <div className={`relative w-full h-full flex items-center justify-center mx-auto`}>
+                      {!media.media_url ? (
+                        <div className="text-red-500">Media URL not available</div>
+                      ) : media.media_type === 'video' ? (
+                        <div className="relative w-full h-full" onClick={index === currentIdx ? handleVideoClick : undefined}>
+                          <video
+                            ref={index === currentIdx ? videoRef : null}
+                            src={media.media_url}
+                            className="w-full h-full object-cover cursor-pointer shadow-lg"
+                            autoPlay={index === currentIdx}
+                            muted={isMuted} // Use the isMuted state
+                            playsInline
+                            preload="metadata"
+                            poster={media.poster_url || undefined}
+                            onEnded={index === currentIdx ? handleVideoEnd : undefined}
+                            // Remove onClick from here as we've moved it to the parent div
+                          />
+                          {index === currentIdx && isCurrentVideo && (
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation(); // Prevent video play/pause
+                                setIsMuted(!isMuted);
+                                if (videoRef.current) {
+                                  videoRef.current.muted = !isMuted;
+                                }
+                              }}
+                              className="absolute bottom-4 right-4 z-20 w-10 h-10 bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/90 transition-all hover:scale-110 shadow-lg"
+                              aria-label={isMuted ? "Unmute video" : "Mute video"}
+                            >
+                              {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+                            </button>
+                          )}
+                        </div>
+                      ) : (
+                        <img
+                          src={media.media_url}
+                          alt={media.title}
+                          className="w-full h-full object-cover shadow-lg"
+                          onClick={() => setSelectedMedia(media)}
+                        />
+                      )}
 
-                    {/* Overlay info */}
-                    {(media.title || media.description) && (
-                      <div className="absolute bottom-3 left-3 max-w-[60%] bg-black/75 backdrop-blur-sm rounded-lg px-3 py-2 flex flex-col items-start gap-0.5 shadow-xl">
-                        {media.title && <h3 className="text-base font-bold text-white leading-tight">{media.title}</h3>}
-                        {media.description && <p className="text-white/80 text-xs leading-snug line-clamp-1">{media.description}</p>}
-                        {media.category && (
-                          <span className="inline-block bg-amber-400/90 text-black px-2 py-0.5 rounded-full text-xs font-semibold shadow-md mt-0.5">
-                            {media.category}
-                          </span>
-                        )}
-                      </div>
-                    )}
+                      {/* Overlay info */}
+                      {(media.title || media.description) && (
+                        <div className="absolute bottom-3 left-3 max-w-[60%] bg-black/75 backdrop-blur-sm rounded-lg px-3 py-2 flex flex-col items-start gap-0.5 shadow-xl">
+                          {media.title && <h3 className="text-base font-bold text-white leading-tight">{media.title}</h3>}
+                          {media.description && <p className="text-white/80 text-xs leading-snug line-clamp-1">{media.description}</p>}
+                          {media.category && (
+                            <span className="inline-block bg-amber-400/90 text-black px-2 py-0.5 rounded-full text-xs font-semibold shadow-md mt-0.5">
+                              {media.category}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+
+              <button
+                onClick={nextSlide}
+                className="z-20 w-10 h-10 bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/90 transition-all hover:scale-110 shadow-lg"
+                aria-label="Next media"
+              >
+                <ChevronRight size={20} />
+              </button>
             </div>
 
-            <button
-              onClick={nextSlide}
-              className="z-20 w-10 h-10 bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/90 transition-all hover:scale-110 shadow-lg"
-              aria-label="Next media"
-            >
-              <ChevronRight size={20} />
-            </button>
-          </div>
-
-          {/* Dots navigation */}
-          <div className="flex justify-center mt-4 space-x-2">
-            {mediaList.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => goToSlide(index)}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  index === currentIdx 
-                    ? 'bg-amber-400 scale-125 shadow-lg' 
-                    : 'bg-white/30 hover:bg-white/50 hover:scale-110'
-                }`}
-                aria-label={`Go to media ${index + 1}`}
-              />
-            ))}
+            {/* Dots navigation */}
+            <div className="flex justify-center mt-4 space-x-2">
+              {mediaList.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToSlide(index)}
+                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                    index === currentIdx 
+                      ? 'bg-amber-400 scale-125 shadow-lg' 
+                      : 'bg-white/30 hover:bg-white/50 hover:scale-110'
+                  }`}
+                  aria-label={`Go to media ${index + 1}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      
 
       {/* Media Modal */}
       <Dialog open={!!selectedMedia} onOpenChange={() => setSelectedMedia(null)}>
