@@ -149,7 +149,17 @@ function BookingForm() {
   return (
     <section id="booking" className="booking py-24 bg-black relative overflow-hidden">
       <div className="container mx-auto px-4">
-        <SectionHeading title="Book Our Services" subtitle="Let us make your next event extraordinary" />
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-extrabold font-['Playfair_Display'] text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-300 to-gray-500 drop-shadow-lg">
+            <span className="bg-gradient-to-r from-white to-gray-300 text-transparent bg-clip-text font-extrabold">
+              Book
+            </span>
+            <span className="bg-gradient-to-r from-gray-300 via-gray-400 to-gray-600 text-transparent bg-clip-text font-bold">
+              &nbsp;Our Services
+            </span>
+          </h2>
+          <p className="text-gray-400 text-lg mt-2">Let us make your next event extraordinary</p>
+        </div>
         <motion.div
           className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto"
           initial={{ opacity: 0, y: 30 }}

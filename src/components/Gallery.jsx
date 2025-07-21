@@ -116,7 +116,18 @@ const Gallery = () => {
   return (
     <section id="gallery" className="py-24 bg-black relative">
       <div className="container mx-auto px-4">
-        <SectionHeading title="Gallery" subtitle="Our Work & Memories" />
+        {/* <SectionHeading title="Gallery" subtitle="Our Work & Memories" /> */}
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-extrabold font-['Playfair_Display'] text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-300 to-gray-500 drop-shadow-lg">
+            <span className="bg-gradient-to-r from-white to-gray-300 text-transparent bg-clip-text font-extrabold">
+              Gal
+            </span>
+            <span className="bg-gradient-to-r from-gray-300 via-gray-400 to-gray-600 text-transparent bg-clip-text font-bold">
+              lery
+            </span>
+          </h2>
+          <p className="text-gray-400 text-lg mt-2">Our Work & Memories</p>
+        </div>
         {/* Navigation Buttons */}
         {categories.length > 0 ? (
           <div className="flex justify-center gap-4 mb-12">
