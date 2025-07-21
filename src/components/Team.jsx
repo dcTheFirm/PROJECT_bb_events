@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import SectionHeading from './SectionHeading';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 
@@ -38,10 +37,17 @@ function Team() {
   return (
     <section id="team" className="team py-24 bg-black relative">
       <div className="container mx-auto">
-        <SectionHeading 
-          title="Meet Our Team" 
-          subtitle="The talented mixologists behind our exceptional service" 
-        />
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-extrabold font-['Playfair_Display'] text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-300 to-gray-500 drop-shadow-lg">
+            <span className="bg-gradient-to-r from-white to-gray-300 text-transparent bg-clip-text font-extrabold">
+              Mee
+            </span>
+            <span className="bg-gradient-to-r from-gray-300 via-gray-400 to-gray-600 text-transparent bg-clip-text font-bold">
+              t Our Team
+            </span>
+          </h2>
+          <p className="text-gray-400 text-lg mt-2">The talented mixologists behind our exceptional service</p>
+        </div>
         <div className="relative min-h-[350px]">
           {loading ? (
             <div className="text-center text-white py-12 text-lg">Loading team members...</div>

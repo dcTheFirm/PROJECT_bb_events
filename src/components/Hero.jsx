@@ -200,8 +200,13 @@ function Hero() {
         <div className="container mx-auto px-4">
           {/* Hero header */}
           <div className="text-center mb-8">
-            <h1 className="text-[30px] md:text-[30px] font-bold font-['Playfair_Display'] text-[#b497bd] drop-shadow-lg">
-              Our Works, Your Inspiration
+            <h1 className="text-[30px] md:text-[30px] font-extrabold font-['Playfair_Display'] text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-300 to-gray-500 drop-shadow-lg">
+              <span className="bg-gradient-to-r from-white to-gray-300 text-transparent bg-clip-text font-extrabold">
+                Our W
+              </span>
+              <span className="bg-gradient-to-r from-gray-300 via-gray-400 to-gray-600 text-transparent bg-clip-text font-bold">
+                orks, Your Inspiration
+              </span>
             </h1>
           </div>
 

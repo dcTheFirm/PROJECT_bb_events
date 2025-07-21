@@ -40,9 +40,17 @@ function Navbar() {
   return <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'py-3 glass-effect shadow-lg' : 'py-6 bg-transparent'}`}>
       <div className="container mx-auto px-4 flex justify-between items-center">
         <div className="flex items-center">
-          <a href="#home" className="text-white text-2xl md:text-3xl font-bold font-playfair">
-            <span className="bg-gradient-to-r from-[#4a90e2] to-[#ff6b6b] bg-clip-text text-transparent">Bartender</span> Brothers
-          </a>
+
+
+
+          <h1 className="text-2xl md:text-3xl font-extrabold font-['Playfair_Display'] text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-300 to-gray-500 tracking-tight drop-shadow-lg">
+            <span className="bg-gradient-to-r from-white to-gray-300 text-transparent bg-clip-text font-extrabold">
+              Bartend
+            </span>
+            <span className="bg-gradient-to-r from-gray-300 via-gray-400 to-gray-600 text-transparent bg-clip-text font-bold">
+              er Brothers
+            </span>
+          </h1>
         </div>
         
         {/* Desktop Navigation */}
@@ -105,5 +113,6 @@ function Navbar() {
         </div>}
     </header>;
 }
+
 
 export default Navbar;

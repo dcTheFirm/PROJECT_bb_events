@@ -36,9 +36,15 @@ const About = () => {
   >
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 font-['Playfair_Display'] text-transparent bg-clip-text bg-gradient-to-r from-gray-300 via-gray-500 to-gray-700">
-            About Us
-          </h2>
+          
+          <h3 className="text-3xl md:text-4xl font-extrabold mb-4 font-['Playfair_Display'] text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-300 to-gray-500 tracking-tight drop-shadow-lg">
+            <span className="bg-gradient-to-r from-white to-gray-300 text-transparent bg-clip-text font-extrabold">
+              Abo
+            </span>
+            <span className="bg-gradient-to-r from-gray-300 via-gray-400 to-gray-600 text-transparent bg-clip-text font-bold">
+              ut Us
+            </span>
+          </h3>
           <p className="text-gray-400 text-lg">Our story of passion for mixology and exceptional service</p>
         </div>
         <div className="grid md:grid-cols-2 gap-12 items-center"> 
@@ -55,10 +61,7 @@ const About = () => {
             </div>
 
 
-            <div className="absolute -bottom-8 -right-8 w-48 h-48 md:w-64 md:h-64 rounded-2xl overflow-hidden rotate-12 glass-effect border border-white/10">
-              {/* position 2 */}
-              <img src={aboutImages[2] || ""} alt="Cocktail close-up" className="w-full h-full object-cover object-center" loading="lazy" />
-            </div>
+
 
             <div className="absolute -top-6 -left-6 w-32 h-32 md:w-48 md:h-48 rounded-full overflow-hidden border-4 border-cocktail-gold/10 glass-effect">
               {/* position 3 */}
