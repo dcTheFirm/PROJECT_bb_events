@@ -171,10 +171,10 @@ function BookingForm() {
             <h3 className="text-2xl font-playfair font-bold mb-6 text-[#4a90e2]/80">Request a Quote</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Input placeholder="Your Name" required className="bg-black/20 border-white/5 text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2" />
+                <Input placeholder="Your Name" required className="bg-black/20 border-[#4a90e2]/30 text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2" />
               </div>
               <div>
-                <Input type="email" placeholder="Your Email" required className="bg-black/20 border-white/5 text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2" />
+                <Input type="email" placeholder="Your Email" required className="bg-black/20 border-[#4a90e2]/30 text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2" />
               </div>
               <div>
                 <Input 
@@ -185,11 +185,11 @@ function BookingForm() {
                   maxLength={10}
                   minLength={10}
                   inputMode="numeric"
-                  className="bg-black/20 border-white/5 text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2" 
+                  className="bg-black/20 border-[#4a90e2]/30 text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2" 
                 />
               </div>
               <div>
-                <select defaultValue="" required className="bg-black/20 border-white/5 text-white placeholder:text-white/30 w-full rounded-md p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2 appearance-none">
+                <select defaultValue="" required className="bg-black/80 border-[#4a90e2]/30 text-white placeholder:text-white/30 w-full rounded-md p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2 appearance-none">
                   <option value="" disabled>Select Event Type</option>
                   <option value="Corporate Event">Corporate Event</option>
                   <option value="Wedding & Anniversary">Wedding & Anniversary</option>
@@ -200,7 +200,7 @@ function BookingForm() {
               </div>
               <div>
                 <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" size={16} />
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70" size={16} />
                   <Input
                     type="date"
                     placeholder="Event Date"
@@ -229,14 +229,14 @@ function BookingForm() {
                         setDateWarning('');
                       }
                     }}
-                    className="bg-black/20 border-white/5 text-white placeholder:text-white/30 pl-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2"
+                    className="bg-black/20 border-[#4a90e2]/30 text-white placeholder:text-white/70 pl-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2"
                   />
                 </div>
                 {dateWarning && <p className="text-red-500 text-sm mt-1">{dateWarning}</p>}
               </div>
               <div>
                 <div className="relative">
-                  <Users className="absolute left-3 top-1/2 -translate-y-1/2 text-white/50" size={16} />
+                  <Users className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70" size={16} />
                   <Input
                     type="number"
                     placeholder="Number of Guests"
@@ -250,50 +250,48 @@ function BookingForm() {
                     }}
                     min={1}
                     max={2000}
-                    className="bg-black/20 border-white/5 text-white placeholder:text-white/30 pl-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2"
+                    className="bg-black/20 border-[#4a90e2]/30 text-white placeholder:text-white/70 pl-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2"
                   />
                 </div>
               </div>
               <div>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-white/50" size={16} />
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-white/70" size={16} />
                   <Input
                     type="text"
                     placeholder="Event Location"
                     required
                     value={location}
                     onChange={e => setLocation(e.target.value)}
-                    className={`bg-black/20 border-white/5 text-white placeholder:text-white/30 w-full rounded-md p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2 appearance-none ${locationWarning ? 'border-2 border-white border-solid focus-visible:ring-blue-500' : ''}`}
+                    className={`bg-black/20 border-[#4a90e2]/30 text-white placeholder:text-white/70 pl-10 w-full rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2 appearance-none ${locationWarning ? 'border-2 border-[#4a90e2] border-solid focus-visible:ring-[#4a90e2]/80' : ''}`}
                   />
                 </div>
                 {locationWarning && (
-                  <p className="text-red-500 text-sm mt-1 border border-white border-solid rounded p-2" style={{ borderColor: '#4a90e2', color: 'red' }}>{locationWarning}</p>
+                  <p className="text-red-500 text-sm mt-1 border border-[#4a90e2] border-solid rounded p-2" style={{ borderColor: '#4a90e2', color: 'red' }}>{locationWarning}</p>
                 )}
               </div>
               <div>
-                <textarea placeholder="Additional Details" rows={4} className="w-full rounded-md border border-white/5 bg-black/20 p-3 text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2" />
+                <textarea placeholder="Additional Details" rows={4} className="w-full rounded-md bg-black/20 border-[#4a90e2]/30 p-3 placeholder:text-white/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a90e2]/80 focus-visible:ring-offset-2" />
               </div>
               <Button type="submit" className="bg-[#4a90e2]/80 hover:bg-[#4a90e2] w-full font-normal text-white">
                 Request a Quote
               </Button>
             </form>
           </div>
-          <div className="relative flex items-end justify-center">
-            <div className="aspect-square rounded-2xl overflow-hidden glass-effect w-full max-w-xl mx-auto">
+          <div className="relative flex items-start justify-center"> {/* Changed from items-end to items-start */}
+            <div className="aspect-square rounded-2xl overflow-hidden glass-effect w-full max-w-xl mx-auto mt-6"> {/* Added mt-6 for top margin */}
               {/* position 1 */}
               <img src={bookingImages[1] || ""} alt="Bartender preparing a drink" className="w-full h-full object-cover object-center" loading="lazy" />
             </div>
             <div
               className="absolute"
               style={{
-                bottom: '-98px',
-                
+                bottom: '60px',
                 right: '-5px',
                 width: '200px',
                 height: '200px',
                 borderRadius: '50%',
                 overflow: 'hidden',
-                
                 background: '#111',
                 boxShadow: '0 2px 16px 0 rgba(74,144,226,0.12)',
               }}
