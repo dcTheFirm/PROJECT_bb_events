@@ -97,19 +97,8 @@ function Hero() {
   };
 
   // Click to pause/resume video and unmute
-  const handleVideoClick = () => {
-    if (videoRef.current) {
-      if (videoRef.current.paused) {
-        // When user clicks to play, don't automatically unmute
-        // Let the user control muting with the dedicated button
-        videoRef.current.play().catch(e => console.log('Video play failed on click:', e));
-        setVideoPaused(false);
-      } else {
-        videoRef.current.pause();
-        setVideoPaused(true);
-      }
-    }
-  };
+  // Video play/pause is now handled by the browser's default controls
+  // We only handle mute/unmute and slide transitions
 
   // Pause/resume autoplay and video when hero is out of view
   useEffect(() => {
@@ -133,7 +122,7 @@ function Hero() {
     }
   }, [isInView, isCurrentVideo, videoPaused]);
 
-  // Image auto-advance logic (1.5 seconds)
+  // Image auto-advance logic (4 seconds)
   useEffect(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -142,7 +131,7 @@ function Hero() {
     if (isAutoplay && !isCurrentVideo) {
       intervalRef.current = setInterval(() => {
         nextSlide();
-      }, 1500);
+      }, 4000); // 4 seconds
     }
     return () => {
       if (intervalRef.current) {
@@ -235,34 +224,44 @@ function Hero() {
                       {!media.media_url ? (
                         <div className="text-red-500">Media URL not available</div>
                       ) : media.media_type === 'video' ? (
-                        <div className="relative w-full h-full" onClick={index === currentIdx ? handleVideoClick : undefined}>
-                          <video
-                            ref={index === currentIdx ? videoRef : null}
-                            src={media.media_url}
-                            className="w-full h-full object-cover cursor-pointer shadow-lg"
-                            autoPlay={index === currentIdx}
-                            muted={isMuted} // Use the isMuted state
-                            playsInline
-                            preload="metadata"
-                            poster={media.poster_url || undefined}
-                            onEnded={index === currentIdx ? handleVideoEnd : undefined}
-                            // Remove onClick from here as we've moved it to the parent div
-                          />
+                        <div className="relative w-full h-full">
+  <video
+    ref={index === currentIdx ? videoRef : null}
+    src={media.media_url}
+    className="w-full h-full object-cover cursor-pointer shadow-lg"
+    autoPlay={index === currentIdx}
+    muted={isMuted} // Use the isMuted state
+    playsInline
+    preload="metadata"
+    poster={media.poster_url || undefined}
+    onEnded={index === currentIdx ? handleVideoEnd : undefined}
+    controls={false} // Hide default controls
+    onClick={() => {
+      if (videoRef.current) {
+        if (videoRef.current.paused) {
+          videoRef.current.play().catch(e => console.log('Video play failed:', e));
+        } else {
+          videoRef.current.pause();
+        }
+      }
+    }}
+  />
                           {index === currentIdx && isCurrentVideo && (
-                            <button 
-                              onClick={(e) => {
-                                e.stopPropagation(); // Prevent video play/pause
-                                setIsMuted(!isMuted);
-                                if (videoRef.current) {
-                                  videoRef.current.muted = !isMuted;
-                                }
-                              }}
-                              className="absolute bottom-4 right-4 z-20 w-10 h-10 bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/90 transition-all hover:scale-110 shadow-lg"
-                              aria-label={isMuted ? "Unmute video" : "Mute video"}
-                            >
-                              {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-                            </button>
-                          )}
+  // Only Mute/Unmute Button remains
+  <button 
+    onClick={(e) => {
+      e.stopPropagation(); // Prevent video play/pause
+      setIsMuted(!isMuted);
+      if (videoRef.current) {
+        videoRef.current.muted = !isMuted;
+      }
+    }}
+    className="absolute bottom-4 right-4 z-20 w-10 h-10 bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/90 transition-all hover:scale-110 shadow-lg"
+    aria-label={isMuted ? "Unmute video" : "Mute video"}
+  >
+    {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+  </button>
+)}
                         </div>
                       ) : (
                         <img

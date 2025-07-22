@@ -278,27 +278,20 @@ function BookingForm() {
               </Button>
             </form>
           </div>
-          <div className="relative flex items-start justify-center"> {/* Changed from items-end to items-start */}
-            <div className="aspect-square rounded-2xl overflow-hidden glass-effect w-full max-w-xl mx-auto mt-6"> {/* Added mt-6 for top margin */}
-              {/* position 1 */}
-              <img src={bookingImages[1] || ""} alt="Bartender preparing a drink" className="w-full h-full object-cover object-center" loading="lazy" />
+          <div className="flex flex-col gap-6 items-center sm:items-end justify-center w-full">
+            <div className="w-full flex flex-col gap-4 items-center sm:items-end">
+              <img src={bookingImages[1] || ""} alt="Bartender preparing a drink" className="w-full max-w-xs sm:max-w-sm md:max-w-xs rounded-2xl shadow-lg object-cover object-center" loading="lazy" />
+            
             </div>
-            <div
-              className="absolute"
-              style={{
-                bottom: '60px',
-                right: '-5px',
-                width: '200px',
-                height: '200px',
-                borderRadius: '50%',
-                overflow: 'hidden',
-                background: '#111',
-                boxShadow: '0 2px 16px 0 rgba(74,144,226,0.12)',
-              }}
+            <a
+              href="/profile.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#4a90e2]/90 to-[#222] text-white font-semibold rounded-xl shadow-lg hover:from-[#357abd] hover:to-[#111] transition-colors duration-200 border border-[#4a90e2]/40 mt-2"
+              style={{ minWidth: '200px', textAlign: 'center' }}
             >
-              {/* position 2 */}
-              <img src={bookingImages[2] || ""} alt="Cocktail glasses" className="w-full h-full object-cover object-center" loading="lazy" />
-            </div>
+              🍸 View our profile.!
+            </a>
           </div>
         </motion.div>
       </div>

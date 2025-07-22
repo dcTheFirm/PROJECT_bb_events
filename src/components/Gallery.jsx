@@ -98,16 +98,7 @@ const Gallery = () => {
       >
         <span className="relative inline-block">
           {children}
-          <span
-            className="absolute left-0 -bottom-1 rounded transition-all duration-300"
-            style={{
-              backgroundColor: 'rgba(236, 72, 153, 0.4)',
-              height: '3px',
-              width: showLine ? '100%' : '0',
-              opacity: hideLine ? 0 : 1,
-              transitionProperty: 'width,opacity,background-color',
-            }}
-          />
+          
         </span>
       </h3>
     );
@@ -135,7 +126,7 @@ const Gallery = () => {
               <button
                 key={cat.key}
                 onClick={() => setActiveCategory(cat.key)}
-                className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 ${
+                className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 shadow-md focus:outline-none ${
                   activeCategory === cat.key
                     ? 'bg-white text-black font-bold scale-105'
                     : 'bg-black/30 text-white hover:bg-black/50'
@@ -161,16 +152,15 @@ const Gallery = () => {
                   {(images[section.id] || []).map((img, idx) => (
                     <div
                       key={img.id}
-                      className="aspect-square overflow-hidden rounded-xl bg-black/40 border border-white/10 shadow-lg cursor-pointer group relative hover:scale-105 transition-transform duration-300 flex items-center justify-center"
+                      className="aspect-square overflow-hidden rounded-lg bg-black/40 border border-white/10 shadow-lg cursor-pointer group relative transition-shadow duration-300 flex items-center justify-center"
                       onClick={() => setSelectedImage(img)}
-                      style={{ width: '100%', maxWidth: '300px', height: '250px' }}
+                      style={{ width: '100%' }}
                     >
                       <img
                         src={img.image_url}
                         alt="Gallery image"
-                        className="max-h-full max-w-full object-contain object-center"
+                        className="w-full h-full object-cover object-center rounded-lg transition-transform duration-300"
                         loading="lazy"
-                        style={{ display: 'block', margin: 'auto' }}
                       />
                     </div>
                   ))}
