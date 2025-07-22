@@ -278,12 +278,26 @@ function BookingForm() {
               </Button>
             </form>
           </div>
-          <div className="relative">
-            <div className="aspect-square rounded-2xl overflow-hidden glass-effect">
+          <div className="relative flex items-end justify-center">
+            <div className="aspect-square rounded-2xl overflow-hidden glass-effect w-full max-w-xl mx-auto">
               {/* position 1 */}
               <img src={bookingImages[1] || ""} alt="Bartender preparing a drink" className="w-full h-full object-cover object-center" loading="lazy" />
             </div>
-            <div className="absolute -bottom-6 -right-6 w-40 h-40 rounded-full overflow-hidden border-4 border-gold/20 glass-effect">
+            <div
+              className="absolute"
+              style={{
+                bottom: '-98px',
+                
+                right: '-5px',
+                width: '200px',
+                height: '200px',
+                borderRadius: '50%',
+                overflow: 'hidden',
+                
+                background: '#111',
+                boxShadow: '0 2px 16px 0 rgba(74,144,226,0.12)',
+              }}
+            >
               {/* position 2 */}
               <img src={bookingImages[2] || ""} alt="Cocktail glasses" className="w-full h-full object-cover object-center" loading="lazy" />
             </div>

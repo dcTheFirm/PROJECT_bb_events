@@ -107,9 +107,7 @@ function Services() {
 							Services
 						</span>
 					</h2>
-					<div className="flex justify-center">
-						<div className="h-1 w-24 bg-gradient-to-r from-gold via-amber-300 to-gold rounded-full opacity-70 mb-4"></div>
-					</div>
+					
 					<p className="text-gray-400 text-lg mt-2">
 						Exceptional mixology services tailored to your needs
 					</p>
@@ -138,7 +136,7 @@ function Services() {
 									transition: { duration: 0.6, type: 'spring' },
 								},
 							}}
-							className="relative group bg-gradient-to-br from-black/80 to-black/60 border border-white/10 rounded-2xl p-8 flex flex-col items-center glass-effect hover:border-gold/60 transition-all duration-300 hover:shadow-[0_4px_32px_0_rgba(255,215,0,0.08)]"
+							className="relative group bg-gradient-to-br from-black/80 to-black/60 border border-white/10 rounded-2xl p-8 flex flex-col items-center glass-effect hover:border-white/30 transition-all duration-300 hover:shadow-[0_4px_32px_0_rgba(255,255,255,0.08)]"
 						>
 							<div className="w-16 h-16 mb-6 rounded-full flex items-center justify-center bg-gradient-to-br from-gold to-amber-400 shadow-lg border-2 border-gold/30">
 								<service.icon size={32} className="text-black/80" />
@@ -157,7 +155,7 @@ function Services() {
 									</li>
 								))}
 							</ul>
-							<div className="absolute inset-0 rounded-2xl pointer-events-none group-hover:ring-2 group-hover:ring-gold/40 transition-all duration-300"></div>
+							<div className="absolute inset-0 rounded-2xl pointer-events-none group-hover:ring-2 group-hover:ring-white/20 transition-all duration-300"></div>
 						</motion.div>
 					))}
 				</motion.div>
@@ -171,7 +169,7 @@ function Services() {
 							whileInView={{ opacity: 1, y: 0 }}
 							transition={{ duration: 0.6, type: 'spring', delay: 0.1 * idx }}
 							viewport={{ once: true }}
-							className="relative group bg-gradient-to-br from-black/80 to-black/60 border border-white/10 rounded-2xl p-8 flex flex-col items-center glass-effect hover:border-gold/60 transition-all duration-300 hover:shadow-[0_4px_32px_0_rgba(255,215,0,0.08)] w-full md:max-w-md"
+							className="relative group bg-gradient-to-br from-black/80 to-black/60 border border-white/10 rounded-2xl p-8 flex flex-col items-center glass-effect hover:border-white/30 transition-all duration-300 hover:shadow-[0_4px_32px_0_rgba(255,255,255,0.08)] w-full md:max-w-md"
 						>
 							<div className="w-16 h-16 mb-6 rounded-full flex items-center justify-center bg-gradient-to-br from-gold to-amber-400 shadow-lg border-2 border-gold/30">
 								<service.icon size={32} className="text-black/80" />
@@ -190,14 +188,14 @@ function Services() {
 									</li>
 								))}
 							</ul>
-							<div className="absolute inset-0 rounded-2xl pointer-events-none group-hover:ring-2 group-hover:ring-gold/40 transition-all duration-300"></div>
+							<div className="absolute inset-0 rounded-2xl pointer-events-none group-hover:ring-2 group-hover:ring-white/20 transition-all duration-300"></div>
 						</motion.div>
 					))}
 				</div>
 
 				{/* Feature callout */}
 				<motion.div
-					className="callout mt-20 glass-effect rounded-2xl p-8 md:p-12 relative overflow-hidden bg-gradient-to-br from-black/90 to-black/70 border border-white/10"
+					className="callout mt-20 glass-effect rounded-2xl p-8 md:p-12 relative overflow-hidden bg-gradient-to-br from-black/90 to-black/70 border border-white/10 hover:border-white/30 transition-all duration-300"
 					initial={{ opacity: 0, y: 40 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.7 }}

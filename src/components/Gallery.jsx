@@ -120,10 +120,10 @@ const Gallery = () => {
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-extrabold font-['Playfair_Display'] text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-300 to-gray-500 drop-shadow-lg">
             <span className="bg-gradient-to-r from-white to-gray-300 text-transparent bg-clip-text font-extrabold">
-              Gal
+               Our Ga
             </span>
             <span className="bg-gradient-to-r from-gray-300 via-gray-400 to-gray-600 text-transparent bg-clip-text font-bold">
-              lery
+              llery
             </span>
           </h2>
           <p className="text-gray-400 text-lg mt-2">Our Work & Memories</p>
@@ -161,15 +161,16 @@ const Gallery = () => {
                   {(images[section.id] || []).map((img, idx) => (
                     <div
                       key={img.id}
-                      className="aspect-square overflow-hidden rounded-xl bg-black/40 border border-white/5 shadow-lg cursor-pointer group relative hover:scale-105 transition-transform duration-300"
+                      className="aspect-square overflow-hidden rounded-xl bg-black/40 border border-white/10 shadow-lg cursor-pointer group relative hover:scale-105 transition-transform duration-300 flex items-center justify-center"
                       onClick={() => setSelectedImage(img)}
                       style={{ width: '100%', maxWidth: '300px', height: '250px' }}
                     >
                       <img
                         src={img.image_url}
                         alt="Gallery image"
-                        className="h-full w-full object-cover object-center"
+                        className="max-h-full max-w-full object-contain object-center"
                         loading="lazy"
+                        style={{ display: 'block', margin: 'auto' }}
                       />
                     </div>
                   ))}
