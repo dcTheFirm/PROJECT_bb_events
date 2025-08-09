@@ -1,6 +1,20 @@
-# Welcome to your project
+# Welcome to Bartender Brothers !!
 
-## Project info
+----------Check on vercel:------------------
+http://project-bb-events.vercel.app 
+--------------------------------------------
+
+# 🥂 Project BB Events
+
+A full-stack bartender events and service platform built using the **MERN stack** (Supabase, React, Node.js). Designed to streamline event bookings, bartender profiles, and service management.
+
+## 🚀 Features
+
+- 🔍 Browse bartender profiles and event services
+- 📅 Book events with real-time availability
+- 🛠 Admin dashboard for managing listings and bookings
+- 📱 Responsive design for mobile and desktop
+
 
 ## How can I edit this code?
 
@@ -22,10 +36,12 @@ git clone <YOUR_GIT_URL>
 cd <YOUR_PROJECT_NAME>
 
 # Step 3: Install the necessary dependencies.
-npm i
+npm install
 
 # Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
+
+# Step 5: Click on the local host server, to see the project live on localhost.
 ```
 
 **Edit a file directly in GitHub**
@@ -51,13 +67,11 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
+- Supabase Integration
 
-## How can I deploy this project?
 
-## Can I connect a custom domain to my project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## 📌 Future Enhancements
+-Payment integration (Stripe/Razorpay)
+-Review and rating system
+-Real-time chat between clients and bartenders
+-Scheduling Demo service based on bookings.
